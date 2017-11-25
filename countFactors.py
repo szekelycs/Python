@@ -1,6 +1,6 @@
 import csv
 import math
-import scipy
+# import scipy
 
 # TODO: pontonkenti sebesseg, pontonkenti szog: min, max, atlag
 # TODO: download 2016/2017 microsoft office
@@ -33,6 +33,44 @@ def countMoveDistance(xCoords, yCoords):
 
     return distanceDetails
 
+
+def pointSpeedAngle(xCoords, yCoords, timeDatas):
+    pointDatas = [None] * 10
+
+    firstLine = True
+    prevX = 0
+    prevY = 0
+    minAngle = 100000
+    maxAngle = -100000
+    minSpeed = 100000
+    maxSpeed = -100000
+    sumAngle = 0
+    n = 0
+    for x, y, t in zip(xCoords, yCoords, timeDatas):
+        n+=1
+        if firstLine == True:
+            firstLine = False
+            prevX = x
+            prevY = y
+            prevT = t
+            continue
+
+        # calculating angle between two dots - comparing to max and min values and reinitialize if needed
+        angle = math.atan2(prevY - y, prevX - x)
+        if angle < minAngle:
+            minAngle = angle
+        if angle > maxAngle:
+            maxAngle = angle
+        sumAngle += angle
+
+        prevX = x
+        prevY = y
+        prevT = t
+
+    pointDatas[0] = minAngle
+    pointDatas[1] = maxAngle
+    pointDatas[2] = sumAngle/n
+    return pointDatas
 
 def countSumDirection(xStart, yStart, xEnd, yEnd):
     y = yEnd - yStart
