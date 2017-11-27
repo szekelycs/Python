@@ -9,8 +9,7 @@ timeLimit = 10
 ###################
 
 #output csv headers
-#TODO: angle - speed for every point? sum?
-csvOutHeaders = ["user", "method", "session", "n_from", "n_to", "rowcnt", "type_of_action", "sumdist", "elpstime", "direction", "straight", "avg_velo", "min_ang", "max_ang", "avg_ang"]
+csvOutHeaders = ["user", "method", "session", "n_from", "n_to", "rowcnt", "type_of_action", "sumdist", "elpstime", "direction", "straight", "min_ang", "max_ang", "avg_ang", "min_vel", "max_vel", "avg_vel"]
 ###################
 
 #mouse move codenames

@@ -14,7 +14,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 # names = ["method", "user", "session", "n_from", "n_to", "rowcnt", "type_of_action", "sumdist", "elpstime", "direction", "straight", "avg_velo"]
-dataset = pandas.read_csv('balabit_features_training_SZCS.csv', skiprows=1)
+dataset = pandas.read_csv('mouse_action_summary.csv', skiprows=1)
 array = dataset.values
 
 X = array[:,1:-1]
