@@ -9,7 +9,7 @@ timeLimit = 10
 ###################
 
 #output csv headers
-csvOutHeaders = ["user", "method", "session", "n_from", "n_to", "rowcnt", "type_of_action", "sumdist", "elpstime", "direction", "straight", "min_ang", "max_ang", "avg_ang", "min_vel", "max_vel", "avg_vel"]
+csvOutHeaders = ["user", "method", "session", "n_from", "n_to", "row_cnt", "type_of_action", "sum_dist", "elps_time", "direction", "straightness", "min_ang", "max_ang", "avg_ang", "sum_ang", "min_vel", "max_vel", "avg_vel", "sum_vel"]
 ###################
 
 #mouse move codenames

@@ -84,10 +84,12 @@ def pointSpeedAngle(xCoords, yCoords, timeDatas, n):
     pointDatas[0] = minAngle
     pointDatas[1] = maxAngle
     pointDatas[2] = sumAngle/n
+    pointDatas[3] = sumAngle
 
-    pointDatas[3] = minVelo
-    pointDatas[4] = maxVelo
-    pointDatas[5] = sumVelo/m
+    pointDatas[4] = minVelo
+    pointDatas[5] = maxVelo
+    pointDatas[6] = sumVelo/m
+    pointDatas[7] = sumVelo
     return pointDatas
 
 def countSumDirection(xStart, yStart, xEnd, yEnd):
