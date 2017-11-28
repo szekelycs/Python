@@ -24,5 +24,5 @@ leftDrag = 3
 'rD'
 rightDrag = 4
 ###################
-trainDir = "E:\Egyetem\Allamvizsga\Python\csvFiles2"
+trainDir = "E:\Egyetem\Allamvizsga\Python\csvFiles"
 

@@ -88,7 +88,10 @@ def pointSpeedAngle(xCoords, yCoords, timeDatas, n):
 
     pointDatas[4] = minVelo
     pointDatas[5] = maxVelo
-    pointDatas[6] = sumVelo/m
+    if m == 0:
+        pointDatas[6] = 0
+    else:
+        pointDatas[6] = sumVelo/m
     pointDatas[7] = sumVelo
     return pointDatas
 

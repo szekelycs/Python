@@ -17,7 +17,7 @@ from sklearn.svm import SVC
 dataset = pandas.read_csv('mouse_action_summary.csv', skiprows=1)
 array = dataset.values
 
-X = array[:,1:-1]
+X = array[:,5:-1]
 Y = array[:,0]
 
 
@@ -27,11 +27,11 @@ scoring = 'accuracy'
 X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size, random_state=seed)
 
 models = []
-# models.append(('LR', LogisticRegression()))
-# models.append(('LDA', LinearDiscriminantAnalysis()))
+models.append(('LR', LogisticRegression()))
+models.append(('LDA', LinearDiscriminantAnalysis()))
 models.append(('KNN', KNeighborsClassifier()))
 models.append(('CART', DecisionTreeClassifier()))
-# models.append(('NB', GaussianNB()))
+models.append(('NB', GaussianNB()))
 models.append(('RF', RandomForestClassifier()))
 # n_estimators = 500
 # models.append(('SVM', SVC()))
