@@ -31,18 +31,23 @@ def countMoveDistance(xCoords, yCoords):
     return distanceDetails
 
 
-def pointSpeedAngle(xCoords, yCoords, timeDatas, n):
-    pointDatas = [None] * 10
+def pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, n):
+    pointDatas = [None] * 23
 
-    firstLine = True
+    firstLine = secondLine = True
     prevX = 0
     prevY = 0
     minAngle = 100000
     maxAngle = -100000
-    minVelo = 100000
-    maxVelo = -100000
-    sumVelo = 0
     sumAngle = 0
+
+    minAcc = 100000
+    maxAcc = -100000
+    sumAcc = 0
+
+    minVelo = minVeloX = minVeloY = 100000
+    maxVelo = maxVeloX = maxVeloY = -100000
+    sumVelo = sumVeloX = sumVeloY = 0
     m = n
     for x, y, t in zip(xCoords, yCoords, timeDatas):
 
@@ -53,21 +58,32 @@ def pointSpeedAngle(xCoords, yCoords, timeDatas, n):
             prevT = t
             continue
 
-
-
-        tmpDistance = math.sqrt((x - prevX) ** 2 + (y - prevY) ** 2)
+        tmpDistanceX = x - prevX
+        tmpDistanceY = y - prevY
         tmpTime = t - prevT
         if tmpTime == 0:
             m = m - 1
         else:
-            tmpVelo = tmpDistance/tmpTime
+            tmpVeloX = abs(tmpDistanceX/tmpTime)
+            if tmpVeloX < minVeloX:
+                minVeloX = tmpVeloX
+            if tmpVeloX > maxVeloX:
+                maxVeloX = tmpVeloX
+            sumVeloX += tmpVeloX
+
+            tmpVeloY = abs(tmpDistanceY/tmpTime)
+            if tmpVeloY < minVeloY:
+                minVeloY = tmpVeloY
+            if tmpVeloY > maxVeloY:
+                maxVeloY = tmpVeloY
+            sumVeloY += tmpVeloY
+
+            tmpVelo = math.sqrt(tmpVeloX ** 2 + tmpVeloY ** 2)
             if tmpVelo < minVelo:
                 minVelo = tmpVelo
             if tmpVelo > maxVelo:
                 maxVelo = tmpVelo
             sumVelo += tmpVelo
-
-
 
         # calculating angle between two dots - comparing to max and min values and reinitialize if needed
         angle = math.atan2(prevY - y, prevX - x)
@@ -77,22 +93,72 @@ def pointSpeedAngle(xCoords, yCoords, timeDatas, n):
             maxAngle = angle
         sumAngle += angle
 
+        if firstLine == False and secondLine == True:
+            secondLine = False
+            prevVelo = 0
+            if tmpTime != 0:
+                prevVelo = tmpVelo
+            continue
+
+        if tmpTime != 0:
+            tmpAcc = (prevVelo - tmpVelo)/tmpTime;
+            if tmpAcc < minAcc:
+                minAcc = tmpAcc
+            if tmpAcc > maxAcc:
+                maxAcc = tmpAcc
+            sumAcc += tmpAcc
+
+        if secondLine == False:
+            prevVelo = 0
+            if tmpTime != 0:
+                prevVelo = tmpVelo
         prevX = x
         prevY = y
         prevT = t
 
+    if minAngle == 100000 or minVeloX == 100000 or minVeloY == 100000 or minAcc == 100000:
+        print(user + " " + fileName + " ")
+        print(xCoords)
+        print(yCoords)
+
+        print(timeDatas)
+        print(pointDatas)
+
     pointDatas[0] = minAngle
     pointDatas[1] = maxAngle
     pointDatas[2] = sumAngle/n
-    pointDatas[3] = sumAngle
 
-    pointDatas[4] = minVelo
-    pointDatas[5] = maxVelo
+    pointDatas[3] = minVeloX
+    pointDatas[4] = maxVeloX
     if m == 0:
-        pointDatas[6] = 0
+        pointDatas[5] = 0
     else:
-        pointDatas[6] = sumVelo/m
-    pointDatas[7] = sumVelo
+        pointDatas[5] = sumVeloX / m
+
+
+    pointDatas[6] = minVeloY
+    pointDatas[7] = maxVeloY
+    if m == 0:
+        pointDatas[8] = 0
+    else:
+        pointDatas[9] = sumVeloY / m
+
+
+    pointDatas[10] = minVelo
+    pointDatas[11] = maxVelo
+    if m == 0:
+        pointDatas[12] = 0
+    else:
+        pointDatas[13] = sumVelo/m
+
+
+    pointDatas[14] = minAcc
+    pointDatas[15] = maxAcc
+    if m == 0:
+        pointDatas[16] = 0
+    else:
+        pointDatas[17] = sumAcc/m
+
     return pointDatas
 
 def countSumDirection(xStart, yStart, xEnd, yEnd):

@@ -44,10 +44,16 @@ def processCsv(method):
                         # skipping first line
                         if firstLine:
                             firstLine = False
+                            prevRow = row
                             continue
+
 
                         # incrementing total row value
                         allRows = allRows + 1
+
+                        if row == prevRow:
+                            continue
+
                         # incrementing the mouse move row value
                         rowCnt = rowCnt + 1
 
@@ -81,16 +87,16 @@ def processCsv(method):
                                     # direction
                                     angleInRad = cf.countSumDirection(xCoords[0], yCoords[0], xCoords[-1], yCoords[-1])
                                     # angle and speed datas (min, max, avg point by point)
-                                    angleVeloDetails = cf.pointSpeedAngle(xCoords, yCoords, timeDatas, rowCnt)
+                                    angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCnt)
 
                                     # append to csv file
-                                    writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.mouseMove, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7]])  # mouse move
+                                    writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.mouseMove, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17]])  # mouse move
                                     # empty the vectors with the x and y coordinates
-                                    del timeDatas[:]
-                                    del xCoords[:]
-                                    del yCoords[:]
-                                    # reinitialize rowCnt
-                                    rowCnt = 0
+                                del timeDatas[:]
+                                del xCoords[:]
+                                del yCoords[:]
+                                # reinitialize rowCnt
+                                rowCnt = 0
                         else:
                             ################################## CASE PRESSED ##################################
                             if row[3] == 'Pressed':
@@ -139,17 +145,17 @@ def processCsv(method):
                                                 angleInRad = cf.countSumDirection(xCoords[0], yCoords[0], xCoords[-1], yCoords[-1])
                                                 tmpMoveFinishTime = None
                                                 # angle and speed datas (min, max, avg point by point)
-                                                angleVeloDetails = cf.pointSpeedAngle(xCoords, yCoords, timeDatas, rowCnt)
+                                                angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCnt)
                                                 # append to csv file
-                                                writer.writerow([user, method, fileName, tmpStartLine, allRows - 2, rowCnt - 2, st.mouseMove, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7]])           #mouse move
-                                                # empty vectors with x and y coordinates
-                                                del timeDatas[:]
-                                                del xCoords[:]
-                                                del yCoords[:]
-                                                # append drag start x and y coordinates (pressed coordiantes)
-                                                xCoords.append(dragStartX)
-                                                yCoords.append(dragStartY)
-                                                timeDatas.append(float(row[1]))
+                                                writer.writerow([user, method, fileName, tmpStartLine, allRows - 2, rowCnt - 2, st.mouseMove, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17]])           #mouse move
+                                            # empty vectors with x and y coordinates
+                                            del timeDatas[:]
+                                            del xCoords[:]
+                                            del yCoords[:]
+                                            # append drag start x and y coordinates (pressed coordiantes)
+                                            xCoords.append(dragStartX)
+                                            yCoords.append(dragStartY)
+                                            timeDatas.append(float(row[1]))
 
                                         # append first drag type row coordinates
                                         xCoords.append(float(row[4]))
@@ -184,17 +190,17 @@ def processCsv(method):
                                                         angleInRad = cf.countSumDirection(xCoords[0], yCoords[0], xCoords[-1], yCoords[-1])
                                                         tmpMoveFinishTime = None
                                                         # angle and speed datas (min, max, avg point by point)
-                                                        angleVeloDetails = cf.pointSpeedAngle(xCoords, yCoords, timeDatas, rowCnt)
+                                                        angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCnt)
                                                         # append to csv file
-                                                        writer.writerow([user, method, fileName, tmpStartLine, allRows - 2, rowCnt - 2, st.mouseMove, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7]])  # mouse move
-                                                        # empty vectors
-                                                        del timeDatas[:]
-                                                        del xCoords[:]
-                                                        del yCoords[:]
-                                                        # append drag start x and y coordinates (pressed coordinates)
-                                                        xCoords.append(dragStartX)
-                                                        yCoords.append(dragStartY)
-                                                        timeDatas.append(float(row[1]))
+                                                        writer.writerow([user, method, fileName, tmpStartLine, allRows - 2, rowCnt - 2, st.mouseMove, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17]])  # mouse move
+                                                    # empty vectors
+                                                    del timeDatas[:]
+                                                    del xCoords[:]
+                                                    del yCoords[:]
+                                                    # append drag start x and y coordinates (pressed coordinates)
+                                                    xCoords.append(dragStartX)
+                                                    yCoords.append(dragStartY)
+                                                    timeDatas.append(float(row[1]))
 
                                                 # append the first drag type x and y coordinates
                                                 xCoords.append(float(row[4]))
@@ -227,16 +233,16 @@ def processCsv(method):
                                                 # direction
                                                 angleInRad = cf.countSumDirection(xCoords[0], yCoords[0], xCoords[-1], yCoords[-1])
                                                 # angle and speed datas (min, max, avg point by point)
-                                                angleVeloDetails = cf.pointSpeedAngle(xCoords, yCoords, timeDatas, rowCnt)
+                                                angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCnt)
                                                 # append to csv file
-                                                writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.rightClick, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7]])  # right click
-                                                # empty x and y coordinates vectors
-                                                del timeDatas[:]
-                                                del xCoords[:]
-                                                del yCoords[:]
-                                                # reinitialize values
-                                                rightPressed = 0
-                                                rowCnt = 0
+                                                writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.rightClick, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17]])  # right click
+                                            # empty x and y coordinates vectors
+                                            del timeDatas[:]
+                                            del xCoords[:]
+                                            del yCoords[:]
+                                            # reinitialize values
+                                            rightPressed = 0
+                                            rowCnt = 0
                                         else:
                                             # case left click
                                             if leftPressed == 1:
@@ -248,16 +254,16 @@ def processCsv(method):
                                                     # direction
                                                     angleInRad = cf.countSumDirection(xCoords[0], yCoords[0], xCoords[-1], yCoords[-1])
                                                     # angle and speed datas (min, max, avg point by point)
-                                                    angleVeloDetails = cf.pointSpeedAngle(xCoords, yCoords, timeDatas, rowCnt)
+                                                    angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCnt)
                                                     # append to csv file
-                                                    writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.leftClick, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7]])       #left click
-                                                    # empty x and y coordinates vectors
-                                                    del timeDatas[:]
-                                                    del xCoords[:]
-                                                    del yCoords[:]
-                                                    # reinitialize values
-                                                    leftPressed = 0
-                                                    rowCnt = 0
+                                                    writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.leftClick, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17]])       #left click
+                                                # empty x and y coordinates vectors
+                                                del timeDatas[:]
+                                                del xCoords[:]
+                                                del yCoords[:]
+                                                # reinitialize values
+                                                leftPressed = 0
+                                                rowCnt = 0
                                             else:
                                                 # case left click drag
                                                 if leftDrag == 1:
@@ -269,16 +275,16 @@ def processCsv(method):
                                                         # direction
                                                         angleInRad = cf.countSumDirection(xCoords[0], yCoords[0], xCoords[-1], yCoords[-1])
                                                         # angle and speed datas (min, max, avg point by point)
-                                                        angleVeloDetails = cf.pointSpeedAngle(xCoords, yCoords, timeDatas, rowCnt)
+                                                        angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCnt)
                                                         # append to csv file
-                                                        writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.leftDrag, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7]])    #left click drag
-                                                        # empty x and y coordinates vectors
-                                                        del timeDatas[:]
-                                                        del xCoords[:]
-                                                        del yCoords[:]
-                                                        # reinitialize values
-                                                        leftDrag = 0
-                                                        rowCnt = 0
+                                                        writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.leftDrag, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17]])    #left click drag
+                                                    # empty x and y coordinates vectors
+                                                    del timeDatas[:]
+                                                    del xCoords[:]
+                                                    del yCoords[:]
+                                                    # reinitialize values
+                                                    leftDrag = 0
+                                                    rowCnt = 0
                                                 else:
                                                     # case right click drag
                                                     if rightDrag == 1:
@@ -290,19 +296,30 @@ def processCsv(method):
                                                             # direction
                                                             angleInRad = cf.countSumDirection(xCoords[0], yCoords[0], xCoords[-1], yCoords[-1])
                                                             # angle and speed datas (min, max, avg point by point)
-                                                            angleVeloDetails = cf.pointSpeedAngle(xCoords, yCoords, timeDatas, rowCnt)
+                                                            angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCnt)
                                                             # append to csv file
-                                                            writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.rightDrag, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7]]) #right click drag
-                                                            # empty x and y coordinates vectors
-                                                            del timeDatas[:]
-                                                            del xCoords[:]
-                                                            del yCoords[:]
-                                                            # reinitialize values
-                                                            rightDrag = 0
-                                                            rowCnt = 0
+                                                            writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.rightDrag, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17]]) #right click drag
+                                                        # empty x and y coordinates vectors
+                                                        del timeDatas[:]
+                                                        del xCoords[:]
+                                                        del yCoords[:]
+                                                        # reinitialize values
+                                                        rightDrag = 0
+                                                        rowCnt = 0
                                                     # case wrong value in state column ---> error?
                                                     else:
-                                                        print("No Press or Drag before Release?, rowCnt: ", rowCnt, " ; n-from: ", tmpStartLine, " ; n-to", allRows)
+                                                        print(user + " " + fileName + " " + "--- no Press or Drag before Release?, rowCnt: ", rowCnt, " ; n-from: ", tmpStartLine, " ; n-to", allRows)
+                                                        del timeDatas[:]
+                                                        del xCoords[:]
+                                                        del yCoords[:]
+
+                                                        leftDrag = 0
+                                                        leftPressed = 0
+                                                        rightPressed = 0
+                                                        rightDrag = 0
+                                                        rowCnt = 0
+
+                        prevRow = row
     return
 
 processCsv('train')
