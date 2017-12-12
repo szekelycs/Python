@@ -35,20 +35,14 @@ def pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, n):
     pointDatas = [None] * 23
 
     firstLine = secondLine = True
-    prevX = 0
-    prevY = 0
-    minAngle = 100000
-    maxAngle = -100000
-    sumAngle = 0
 
-    minAcc = 100000
-    maxAcc = -100000
-    sumAcc = 0
+    acc = []
+    angles = []
+    veloX = []
+    veloY = []
+    velo = []
+    w = []
 
-    minVelo = minVeloX = minVeloY = 100000
-    maxVelo = maxVeloX = maxVeloY = -100000
-    sumVelo = sumVeloX = sumVeloY = 0
-    m = n
     for x, y, t in zip(xCoords, yCoords, timeDatas):
 
         if firstLine == True:
@@ -61,103 +55,84 @@ def pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, n):
         tmpDistanceX = x - prevX
         tmpDistanceY = y - prevY
         tmpTime = t - prevT
-        if tmpTime == 0:
-            m = m - 1
-        else:
-            tmpVeloX = abs(tmpDistanceX/tmpTime)
-            if tmpVeloX < minVeloX:
-                minVeloX = tmpVeloX
-            if tmpVeloX > maxVeloX:
-                maxVeloX = tmpVeloX
-            sumVeloX += tmpVeloX
-
-            tmpVeloY = abs(tmpDistanceY/tmpTime)
-            if tmpVeloY < minVeloY:
-                minVeloY = tmpVeloY
-            if tmpVeloY > maxVeloY:
-                maxVeloY = tmpVeloY
-            sumVeloY += tmpVeloY
-
-            tmpVelo = math.sqrt(tmpVeloX ** 2 + tmpVeloY ** 2)
-            if tmpVelo < minVelo:
-                minVelo = tmpVelo
-            if tmpVelo > maxVelo:
-                maxVelo = tmpVelo
-            sumVelo += tmpVelo
 
         # calculating angle between two dots - comparing to max and min values and reinitialize if needed
-        angle = math.atan2(prevY - y, prevX - x)
-        if angle < minAngle:
-            minAngle = angle
-        if angle > maxAngle:
-            maxAngle = angle
-        sumAngle += angle
+        angles.append(math.atan2(prevY - y, prevX - x))
+
+        if tmpTime == 0:
+            continue
+        else:
+            veloX.append(abs(tmpDistanceX/tmpTime))
+
+            veloY.append(abs(tmpDistanceY/tmpTime))
+
+            velo.append(math.sqrt(veloX[-1] ** 2 + veloY[-1] ** 2))
+
+            w.append((angles[-1]/tmpTime))
 
         if firstLine == False and secondLine == True:
             secondLine = False
             prevVelo = 0
             if tmpTime != 0:
-                prevVelo = tmpVelo
+                prevVelo = velo[-1]
             continue
 
         if tmpTime != 0:
-            tmpAcc = (prevVelo - tmpVelo)/tmpTime;
-            if tmpAcc < minAcc:
-                minAcc = tmpAcc
-            if tmpAcc > maxAcc:
-                maxAcc = tmpAcc
-            sumAcc += tmpAcc
+            acc.append((prevVelo - velo[-1])/tmpTime)
 
         if secondLine == False:
             prevVelo = 0
             if tmpTime != 0:
-                prevVelo = tmpVelo
+                prevVelo = velo[-1]
         prevX = x
         prevY = y
         prevT = t
 
-    if minAngle == 100000 or minVeloX == 100000 or minVeloY == 100000 or minAcc == 100000:
-        print(user + " " + fileName + " ")
-        print(xCoords)
-        print(yCoords)
 
-        print(timeDatas)
-        print(pointDatas)
 
-    pointDatas[0] = minAngle
-    pointDatas[1] = maxAngle
-    pointDatas[2] = sumAngle/n
+    pointDatas[0] = min(angles)
+    pointDatas[1] = max(angles)
+    if (len(angles) == 0):
+        pointDatas[2] = 0
+    else:
+        pointDatas[2] = sum(angles) / len(angles)
 
-    pointDatas[3] = minVeloX
-    pointDatas[4] = maxVeloX
-    if m == 0:
+
+    pointDatas[3] = min(veloX)
+    pointDatas[4] = max(veloX)
+    if (len(veloX) == 0):
         pointDatas[5] = 0
     else:
-        pointDatas[5] = sumVeloX / m
+        pointDatas[5] = sum(veloX) / len(veloX)
 
 
-    pointDatas[6] = minVeloY
-    pointDatas[7] = maxVeloY
-    if m == 0:
+    pointDatas[6] = min(veloY)
+    pointDatas[7] = max(veloY)
+    if (len(veloY) == 0):
         pointDatas[8] = 0
     else:
-        pointDatas[9] = sumVeloY / m
+        pointDatas[8] = sum(veloY) / len(veloY)
 
-
-    pointDatas[10] = minVelo
-    pointDatas[11] = maxVelo
-    if m == 0:
-        pointDatas[12] = 0
+    pointDatas[9] = min(velo)
+    pointDatas[10] = max(velo)
+    if (len(velo) == 0):
+        pointDatas[11] = 0
     else:
-        pointDatas[13] = sumVelo/m
+        pointDatas[11] = sum(velo) / len(velo)
 
-
-    pointDatas[14] = minAcc
-    pointDatas[15] = maxAcc
-    if m == 0:
-        pointDatas[16] = 0
+    pointDatas[12] = min(acc)
+    pointDatas[13] = max(acc)
+    if (len(acc) == 0):
+        pointDatas[14] = 0
     else:
-        pointDatas[17] = sumAcc/m
+        pointDatas[14] = sum(acc) / len(acc)
+
+    pointDatas[15] = min(w)
+    pointDatas[16] = max(w)
+    if (len(w) == 0):
+        pointDatas[17] = 0
+    else:
+        pointDatas[17] = sum(w) / len(w)
 
     return pointDatas
 

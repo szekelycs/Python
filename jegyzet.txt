@@ -1,0 +1,32 @@
+hogyha idõkorlátot túllépi -> move
+released, ha elõtte pressed -> move + point click (left/right)
+released, ha elõtte drag -> move + drag
+
+
+TODO 2  // 2017.10.10
+csv generálás : user : session : type-of-action : n-to : n-from ...
+
+user
+session
+n_from
+n_to
+type_of_action
+--------------
+külön szkript : jellemzõk kinyerése - külön test és training
+tömbökkel - xkoord, ykoord, idõ (client-timestamp)
+jellemzõk:
+ 	x  szakaszok hossza összegben - travel distance
+	x  eltelt idõ - elapsed time
+	x  elmozdulás iránya - direction kp és vp közötti szakasz iránya (szög) math.atan2 
+	x milyen mértékben egyenes - teljes hossz / direkt hossz
+	x  hány esemény van az adathalmazban rowcnt 
+	teta szögsorozat minden szakasz szöge (az elsõ nulla)
+	minden pontra sebesség
+	átlagsebesség
+
+TODO 3 //2017.10.24
+python anaconda telepitese - random forest - machinelearning
+TODO 4 //2017.11.28
+google drive cikk feature szamitas kepletek
+
+	

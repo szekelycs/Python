@@ -17,8 +17,9 @@ def processCsv(method):
                 with open(absoluteFilePath) as csvInFile:
                     reader = csv.reader(csvInFile)
 
+
                     # starts counting at the beginning of mouse action
-                    rowCnt = 0;
+                    rowCnt = rowCntWithoutDuplicates = 0;
                     # 1 - if left click is pressed # 0 - if no action with left button
                     leftPressed = 0
                     # 1 - if right click is pressed # 0 - if no action with right button
@@ -53,6 +54,8 @@ def processCsv(method):
 
                         if row == prevRow:
                             continue
+                        else:
+                            rowCntWithoutDuplicates = rowCntWithoutDuplicates + 1
 
                         # incrementing the mouse move row value
                         rowCnt = rowCnt + 1
@@ -87,7 +90,11 @@ def processCsv(method):
                                     # direction
                                     angleInRad = cf.countSumDirection(xCoords[0], yCoords[0], xCoords[-1], yCoords[-1])
                                     # angle and speed datas (min, max, avg point by point)
+                                    print("BEFORE: ", user, fileName, len(xCoords), len(yCoords), len(timeDatas), rowCnt)
+
                                     angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCnt)
+
+                                    print("AFTER: ", user, fileName, len(xCoords), len(yCoords), len(timeDatas), rowCnt)
 
                                     # append to csv file
                                     writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.mouseMove, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17]])  # mouse move
@@ -182,10 +189,10 @@ def processCsv(method):
                                                     xCoords.pop()
                                                     yCoords.pop()
 
-                                                    # distance and straightness
-                                                    distanceDetails = cf.countMoveDistance(xCoords, yCoords)
-                                                    # time, direction, velocity(unit/s)
                                                     if (rowCnt - 2) > 4:
+                                                        # distance and straightness
+                                                        distanceDetails = cf.countMoveDistance(xCoords, yCoords)
+                                                        # time, direction, velocity(unit/s)
                                                         time = tmpMoveFinishTime - tmpStartTime;
                                                         angleInRad = cf.countSumDirection(xCoords[0], yCoords[0], xCoords[-1], yCoords[-1])
                                                         tmpMoveFinishTime = None
@@ -219,7 +226,6 @@ def processCsv(method):
                                                         xCoords.append(float(row[4]))
                                                         yCoords.append(float(row[5]))
                                                         timeDatas.append(float(row[1]))
-                                                    rightPressed = 0
                                 else:
                                     ################################## CASE RELEASED ##################################
                                     if row[3] == 'Released':
