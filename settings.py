@@ -1,5 +1,5 @@
 outputFile = 'mouse_action_summary.csv'
-
+classOutputFile = 'userClassification'
 #parameters for mouse move plots
 leftClickOnly = 1
 rightClickOnly = 1
@@ -24,5 +24,9 @@ leftDrag = 3
 'rD'
 rightDrag = 4
 ###################
-trainDir = "E:\Egyetem\Allamvizsga\Python\csvFiles"
+# trainDir = "E:\Egyetem\Allamvizsga\Python\csvFiles"
+trainDir = 'D:\\Uni\\Allamvizsga\\Python\\csvFiles'
 
+###################
+# upper limit for xCoord and yCoord
+upLim = 2500

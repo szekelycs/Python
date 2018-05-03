@@ -42,7 +42,7 @@ def pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, n):
     veloY = []
     velo = []
     w = []
-
+    # print(len(xCoords), " ", len(yCoords), " ", len(timeDatas))
     for x, y, t in zip(xCoords, yCoords, timeDatas):
 
         if firstLine == True:
@@ -90,48 +90,59 @@ def pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, n):
 
 
 
-    pointDatas[0] = min(angles)
-    pointDatas[1] = max(angles)
+
     if (len(angles) == 0):
+        pointDatas[0] = 0
+        pointDatas[1] = 0
         pointDatas[2] = 0
     else:
+        pointDatas[0] = min(angles)
+        pointDatas[1] = max(angles)
         pointDatas[2] = sum(angles) / len(angles)
 
-
-    pointDatas[3] = min(veloX)
-    pointDatas[4] = max(veloX)
     if (len(veloX) == 0):
+        pointDatas[3] = 0
+        pointDatas[4] = 0
         pointDatas[5] = 0
     else:
+        pointDatas[3] = min(veloX)
+        pointDatas[4] = max(veloX)
         pointDatas[5] = sum(veloX) / len(veloX)
 
-
-    pointDatas[6] = min(veloY)
-    pointDatas[7] = max(veloY)
     if (len(veloY) == 0):
+        pointDatas[6] = 0
+        pointDatas[7] = 0
         pointDatas[8] = 0
     else:
+        pointDatas[6] = min(veloY)
+        pointDatas[7] = max(veloY)
         pointDatas[8] = sum(veloY) / len(veloY)
 
-    pointDatas[9] = min(velo)
-    pointDatas[10] = max(velo)
     if (len(velo) == 0):
+        pointDatas[9] = 0
+        pointDatas[10] = 0
         pointDatas[11] = 0
     else:
+        pointDatas[9] = min(velo)
+        pointDatas[10] = max(velo)
         pointDatas[11] = sum(velo) / len(velo)
 
-    pointDatas[12] = min(acc)
-    pointDatas[13] = max(acc)
     if (len(acc) == 0):
         pointDatas[14] = 0
+        pointDatas[12] = 0
+        pointDatas[13] = 0
     else:
+        pointDatas[12] = min(acc)
+        pointDatas[13] = max(acc)
         pointDatas[14] = sum(acc) / len(acc)
 
-    pointDatas[15] = min(w)
-    pointDatas[16] = max(w)
     if (len(w) == 0):
+        pointDatas[15] = 0
+        pointDatas[16] = 0
         pointDatas[17] = 0
     else:
+        pointDatas[15] = min(w)
+        pointDatas[16] = max(w)
         pointDatas[17] = sum(w) / len(w)
 
     return pointDatas

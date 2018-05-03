@@ -2,6 +2,7 @@ import csv
 import settings as st
 import countFactors as cf
 import os
+import re
 
 def processCsv(method):
 
@@ -12,6 +13,8 @@ def processCsv(method):
         for dirname, dirnames, filenames in os.walk(st.trainDir):
             for fileName in filenames:
                 user = os.path.basename(dirname)
+                user = re.findall('\d+', user)[0]
+
                 absoluteFilePath = os.path.join(dirname, fileName)
                 # open csv reader and writer files
                 with open(absoluteFilePath) as csvInFile:
@@ -75,14 +78,14 @@ def processCsv(method):
                             # if drag follows save finishing time for the mouse move action
                             tmpMoveFinishTime = float(row[1]);
                             # appending x and y coords to the vectors
-                            if float(row[4]) < 2500 or float(row[5]) < 2500:
+                            if float(row[4]) < st.upLim or float(row[5]) < st.upLim:
                                 xCoords.append(float(row[4]))
                                 yCoords.append(float(row[5]))
                                 timeDatas.append(float(row[1]))
 
                             # exceeded limit case
                             if limit < float(row[1]):
-                                if rowCnt > 4:
+                                if rowCntWithoutDuplicates > 4 :
                                     # distance and straightness
                                     distanceDetails = cf.countMoveDistance(xCoords, yCoords)
                                     # time
@@ -90,11 +93,9 @@ def processCsv(method):
                                     # direction
                                     angleInRad = cf.countSumDirection(xCoords[0], yCoords[0], xCoords[-1], yCoords[-1])
                                     # angle and speed datas (min, max, avg point by point)
-                                    print("BEFORE: ", user, fileName, len(xCoords), len(yCoords), len(timeDatas), rowCnt)
-
-                                    angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCnt)
-
-                                    print("AFTER: ", user, fileName, len(xCoords), len(yCoords), len(timeDatas), rowCnt)
+                                    # if (len(xCoords) != rowCntWithoutDuplicates):
+                                    #     print(user, fileName, len(xCoords), len(yCoords), len(timeDatas), rowCntWithoutDuplicates, tmpStartLine, allRows)
+                                    angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCntWithoutDuplicates)
 
                                     # append to csv file
                                     writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.mouseMove, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17]])  # mouse move
@@ -104,6 +105,7 @@ def processCsv(method):
                                 del yCoords[:]
                                 # reinitialize rowCnt
                                 rowCnt = 0
+                                rowCntWithoutDuplicates = 0
                         else:
                             ################################## CASE PRESSED ##################################
                             if row[3] == 'Pressed':
@@ -114,7 +116,7 @@ def processCsv(method):
                                     # if drag follows we save the time
                                     tmpLeftDragStartTime = float(row[1])
                                     # if drag follows we save the x and y coordinates and we append x and y coordinates if left click happens
-                                    if float(row[4]) < 2500 or float(row[5]) < 2500:
+                                    if float(row[4]) < st.upLim or float(row[5]) < st.upLim:
                                         dragStartX = float(row[4])
                                         dragStartY = float(row[5])
                                         xCoords.append(float(row[4]))
@@ -127,7 +129,7 @@ def processCsv(method):
                                     # if right click drag follows we save the time
                                     tmpRightDragStartTime = float(row[1])
                                     # if drag follows we save the x and y coordinates and we append x and y coordinates if right click release
-                                    if float(row[4]) < 2500 or float(row[5]) < 2500:
+                                    if float(row[4]) < st.upLim or float(row[5]) < st.upLim:
                                         dragStartX = float(row[4])
                                         dragStartY = float(row[5])
                                         xCoords.append(float(row[4]))
@@ -147,12 +149,14 @@ def processCsv(method):
                                             distanceDetails = cf.countMoveDistance(xCoords, yCoords)
 
                                             # time, direction, velocities(unit/s)
-                                            if (rowCnt - 2) > 4:
+                                            if (rowCntWithoutDuplicates - 2) > 4:
                                                 time = tmpMoveFinishTime - tmpStartTime;
                                                 angleInRad = cf.countSumDirection(xCoords[0], yCoords[0], xCoords[-1], yCoords[-1])
                                                 tmpMoveFinishTime = None
                                                 # angle and speed datas (min, max, avg point by point)
-                                                angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCnt)
+                                                angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCntWithoutDuplicates)
+                                                # if (len(xCoords) != rowCntWithoutDuplicates):
+                                                #     print(user, fileName, len(xCoords), len(yCoords), len(timeDatas), rowCntWithoutDuplicates, tmpStartLine, allRows)
                                                 # append to csv file
                                                 writer.writerow([user, method, fileName, tmpStartLine, allRows - 2, rowCnt - 2, st.mouseMove, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17]])           #mouse move
                                             # empty vectors with x and y coordinates
@@ -160,24 +164,25 @@ def processCsv(method):
                                             del xCoords[:]
                                             del yCoords[:]
                                             # append drag start x and y coordinates (pressed coordiantes)
-                                            xCoords.append(dragStartX)
-                                            yCoords.append(dragStartY)
-                                            timeDatas.append(float(row[1]))
+                                        xCoords.append(dragStartX)
+                                        yCoords.append(dragStartY)
+                                        timeDatas.append(tmpLeftDragStartTime)
 
                                         # append first drag type row coordinates
                                         xCoords.append(float(row[4]))
                                         yCoords.append(float(row[5]))
                                         timeDatas.append(float(row[1]))
                                         # reinitialize values
-                                        tmpStartTime = float(row[1])
+                                        tmpStartTime = tmpLeftDragStartTime
                                         rowCnt = 2
+                                        rowCntWithoutDuplicates = 2
                                         tmpStartLine = allRows - 1
                                         leftDrag = 1
                                         leftPressed = 0
                                     else:
                                         # case left click drag
                                         if leftDrag == 1:
-                                            if float(row[4]) < 2500 or float(row[5]) < 2500:
+                                            if float(row[4]) < st.upLim or float(row[5]) < st.upLim:
                                                 xCoords.append(float(row[4]))
                                                 yCoords.append(float(row[5]))
                                                 timeDatas.append(float(row[1]))
@@ -189,7 +194,7 @@ def processCsv(method):
                                                     xCoords.pop()
                                                     yCoords.pop()
 
-                                                    if (rowCnt - 2) > 4:
+                                                    if (rowCntWithoutDuplicates - 2) > 4:
                                                         # distance and straightness
                                                         distanceDetails = cf.countMoveDistance(xCoords, yCoords)
                                                         # time, direction, velocity(unit/s)
@@ -197,7 +202,9 @@ def processCsv(method):
                                                         angleInRad = cf.countSumDirection(xCoords[0], yCoords[0], xCoords[-1], yCoords[-1])
                                                         tmpMoveFinishTime = None
                                                         # angle and speed datas (min, max, avg point by point)
-                                                        angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCnt)
+                                                        # if (len(xCoords) != rowCntWithoutDuplicates):
+                                                        #     print(user, fileName, len(xCoords), len(yCoords), len(timeDatas), rowCntWithoutDuplicates, tmpStartLine, allRows)
+                                                        angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCntWithoutDuplicates)
                                                         # append to csv file
                                                         writer.writerow([user, method, fileName, tmpStartLine, allRows - 2, rowCnt - 2, st.mouseMove, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17]])  # mouse move
                                                     # empty vectors
@@ -205,24 +212,25 @@ def processCsv(method):
                                                     del xCoords[:]
                                                     del yCoords[:]
                                                     # append drag start x and y coordinates (pressed coordinates)
-                                                    xCoords.append(dragStartX)
-                                                    yCoords.append(dragStartY)
-                                                    timeDatas.append(float(row[1]))
+                                                xCoords.append(dragStartX)
+                                                yCoords.append(dragStartY)
+                                                timeDatas.append(tmpRightDragStartTime)
 
                                                 # append the first drag type x and y coordinates
                                                 xCoords.append(float(row[4]))
                                                 yCoords.append(float(row[5]))
                                                 timeDatas.append(float(row[1]))
                                                 # reinitalize starting time with current value
-                                                tmpStartTime = float(row[1])
+                                                tmpStartTime = tmpRightDragStartTime
                                                 rowCnt = 2
+                                                rowCntWithoutDuplicates = 2
                                                 tmpStartLine = allRows - 1
                                                 rightDrag = 1
                                                 rightPressed = 0
                                             else:
                                                 # case right click drag
                                                 if rightDrag == 1:
-                                                    if float(row[4]) < 2500 or float(row[5]) < 2500:
+                                                    if float(row[4]) < st.upLim or float(row[5]) < st.upLim:
                                                         xCoords.append(float(row[4]))
                                                         yCoords.append(float(row[5]))
                                                         timeDatas.append(float(row[1]))
@@ -231,7 +239,13 @@ def processCsv(method):
                                     if row[3] == 'Released':
                                         # case right click
                                         if rightPressed == 1:
-                                            if rowCnt > 4:
+                                            # release coordinates append
+                                            if float(row[4]) < st.upLim or float(row[5]) < st.upLim:
+                                                xCoords.append(float(row[4]))
+                                                yCoords.append(float(row[5]))
+                                                timeDatas.append(float(row[1]))
+
+                                            if rowCntWithoutDuplicates > 4:
                                                 # distance and straightness
                                                 distanceDetails = cf.countMoveDistance(xCoords, yCoords)
                                                 # time
@@ -239,7 +253,9 @@ def processCsv(method):
                                                 # direction
                                                 angleInRad = cf.countSumDirection(xCoords[0], yCoords[0], xCoords[-1], yCoords[-1])
                                                 # angle and speed datas (min, max, avg point by point)
-                                                angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCnt)
+                                                # if (len(xCoords) != rowCntWithoutDuplicates):
+                                                #     print(user, fileName, len(xCoords), len(yCoords), len(timeDatas), rowCntWithoutDuplicates, tmpStartLine, allRows)
+                                                angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCntWithoutDuplicates)
                                                 # append to csv file
                                                 writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.rightClick, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17]])  # right click
                                             # empty x and y coordinates vectors
@@ -249,10 +265,17 @@ def processCsv(method):
                                             # reinitialize values
                                             rightPressed = 0
                                             rowCnt = 0
+                                            rowCntWithoutDuplicates = 0
                                         else:
                                             # case left click
                                             if leftPressed == 1:
-                                                if rowCnt > 4:
+                                                # release coordinates append
+                                                if float(row[4]) < st.upLim or float(row[5]) < st.upLim:
+                                                    xCoords.append(float(row[4]))
+                                                    yCoords.append(float(row[5]))
+                                                    timeDatas.append(float(row[1]))
+
+                                                if rowCntWithoutDuplicates > 4:
                                                     # distance and straightness
                                                     distanceDetails = cf.countMoveDistance(xCoords, yCoords)
                                                     # time
@@ -260,7 +283,11 @@ def processCsv(method):
                                                     # direction
                                                     angleInRad = cf.countSumDirection(xCoords[0], yCoords[0], xCoords[-1], yCoords[-1])
                                                     # angle and speed datas (min, max, avg point by point)
-                                                    angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCnt)
+                                                    angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCntWithoutDuplicates)
+
+                                                    # if(len(xCoords) != rowCntWithoutDuplicates):
+                                                    #     print(user, fileName, len(xCoords), len(yCoords), len(timeDatas), rowCntWithoutDuplicates, tmpStartLine, allRows)
+
                                                     # append to csv file
                                                     writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.leftClick, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17]])       #left click
                                                 # empty x and y coordinates vectors
@@ -270,10 +297,17 @@ def processCsv(method):
                                                 # reinitialize values
                                                 leftPressed = 0
                                                 rowCnt = 0
+                                                rowCntWithoutDuplicates = 0
                                             else:
                                                 # case left click drag
                                                 if leftDrag == 1:
-                                                    if rowCnt > 4:
+                                                    # release coordinates append
+                                                    if float(row[4]) < st.upLim or float(row[5]) < st.upLim:
+                                                        xCoords.append(float(row[4]))
+                                                        yCoords.append(float(row[5]))
+                                                        timeDatas.append(float(row[1]))
+
+                                                    if rowCntWithoutDuplicates > 4:
                                                         # distance and straightness
                                                         distanceDetails = cf.countMoveDistance(xCoords, yCoords)
                                                         # time
@@ -281,7 +315,10 @@ def processCsv(method):
                                                         # direction
                                                         angleInRad = cf.countSumDirection(xCoords[0], yCoords[0], xCoords[-1], yCoords[-1])
                                                         # angle and speed datas (min, max, avg point by point)
-                                                        angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCnt)
+                                                        # if (len(xCoords) != rowCntWithoutDuplicates):
+                                                        #     print(user, fileName, len(xCoords), len(yCoords), len(timeDatas), rowCntWithoutDuplicates, tmpStartLine, allRows)
+
+                                                        angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCntWithoutDuplicates)
                                                         # append to csv file
                                                         writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.leftDrag, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17]])    #left click drag
                                                     # empty x and y coordinates vectors
@@ -291,10 +328,17 @@ def processCsv(method):
                                                     # reinitialize values
                                                     leftDrag = 0
                                                     rowCnt = 0
+                                                    rowCntWithoutDuplicates = 0
                                                 else:
                                                     # case right click drag
                                                     if rightDrag == 1:
-                                                        if rowCnt > 4:
+                                                        # release coordinates append
+                                                        if float(row[4]) < st.upLim or float(row[5]) < st.upLim:
+                                                            xCoords.append(float(row[4]))
+                                                            yCoords.append(float(row[5]))
+                                                            timeDatas.append(float(row[1]))
+
+                                                        if rowCntWithoutDuplicates > 4:
                                                             # distance and straightness
                                                             distanceDetails = cf.countMoveDistance(xCoords, yCoords)
                                                             # time
@@ -302,7 +346,7 @@ def processCsv(method):
                                                             # direction
                                                             angleInRad = cf.countSumDirection(xCoords[0], yCoords[0], xCoords[-1], yCoords[-1])
                                                             # angle and speed datas (min, max, avg point by point)
-                                                            angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCnt)
+                                                            angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCntWithoutDuplicates)
                                                             # append to csv file
                                                             writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.rightDrag, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17]]) #right click drag
                                                         # empty x and y coordinates vectors
@@ -312,9 +356,10 @@ def processCsv(method):
                                                         # reinitialize values
                                                         rightDrag = 0
                                                         rowCnt = 0
+                                                        rowCntWithoutDuplicates = 0
                                                     # case wrong value in state column ---> error?
                                                     else:
-                                                        print(user + " " + fileName + " " + "--- no Press or Drag before Release?, rowCnt: ", rowCnt, " ; n-from: ", tmpStartLine, " ; n-to", allRows)
+                                                        print(user, " ", fileName, " ", "--- no Press or Drag before Release?, rowCnt: ", rowCnt, " ; n-from: ", tmpStartLine, " ; n-to", allRows)
                                                         del timeDatas[:]
                                                         del xCoords[:]
                                                         del yCoords[:]
@@ -324,6 +369,11 @@ def processCsv(method):
                                                         rightPressed = 0
                                                         rightDrag = 0
                                                         rowCnt = 0
+                                                        rowCntWithoutDuplicates = 0
+                                    if row[3] == 'Down' or row[3] == 'Up':
+                                        rowCnt = rowCnt - 1
+                                        rowCntWithoutDuplicates = rowCntWithoutDuplicates - 1
+
 
                         prevRow = row
     return
@@ -339,5 +389,3 @@ processCsv('train')
 # ends with class,session,n_from,n_to
 #numFeatures = int(dataset.shape[1]) - 3  ---- shape[0] sorok szama, shape[1] oszlopok szama
 #classes = dataset.groupby('class')
-
-#ket egymast koveto sor teljesen megegyezik - kiszurni
