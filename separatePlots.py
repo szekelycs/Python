@@ -28,7 +28,7 @@ def processCsv(fileName):
 
         mm = mpatches.Patch(color='red', label='Mouse Move - MM')
         rc = mpatches.Patch(color='black', label='Right Click - RC')
-        lc = mpatches.Patch(color='yellow', label='Left Click - LC')
+        lc = mpatches.Patch(color='lightblue', label='Left Click - LC')
         ld = mpatches.Patch(color='green', label='Left Click Drag - LD')
         # rd = mpatches.Patch(color='magenta', label='Right Click Drag - RD')
 
@@ -149,7 +149,7 @@ def processCsv(fileName):
                                     rowCnt = 0
 
                                     if st.leftClickOnly == 1:
-                                        plt.plot(xCoords, yCoords, linestyle='-', color='yellow', linewidth=0.1, markersize=0.8, marker='.')
+                                        plt.plot(xCoords, yCoords, linestyle='-', color='lightblue', linewidth=0.2, markersize=0.8, marker='.')
                                     del xCoords[:]
                                     del yCoords[:]
                                 else:
@@ -178,7 +178,7 @@ def processCsv(fileName):
         plt.show()
         return
 
-processCsv('session_2144641057.csv')
+processCsv('session_0061629194.csv')
 
 
 #import pandas as pd

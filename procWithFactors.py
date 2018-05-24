@@ -20,6 +20,8 @@ def processCsv(method):
                 with open(absoluteFilePath) as csvInFile:
                     reader = csv.reader(csvInFile)
 
+                    fileName = re.findall(r'\d+', fileName)[0]
+
 
                     # starts counting at the beginning of mouse action
                     rowCnt = rowCntWithoutDuplicates = 0;
@@ -92,13 +94,10 @@ def processCsv(method):
                                     time = float(row[1]) - tmpStartTime;
                                     # direction
                                     angleInRad = cf.countSumDirection(xCoords[0], yCoords[0], xCoords[-1], yCoords[-1])
-                                    # angle and speed datas (min, max, avg point by point)
-                                    # if (len(xCoords) != rowCntWithoutDuplicates):
-                                    #     print(user, fileName, len(xCoords), len(yCoords), len(timeDatas), rowCntWithoutDuplicates, tmpStartLine, allRows)
                                     angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCntWithoutDuplicates)
 
                                     # append to csv file
-                                    writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.mouseMove, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17]])  # mouse move
+                                    writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.mouseMove, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17], angleVeloDetails[18], angleVeloDetails[19], angleVeloDetails[20], angleVeloDetails[21]])  # mouse move
                                     # empty the vectors with the x and y coordinates
                                 del timeDatas[:]
                                 del xCoords[:]
@@ -158,7 +157,7 @@ def processCsv(method):
                                                 # if (len(xCoords) != rowCntWithoutDuplicates):
                                                 #     print(user, fileName, len(xCoords), len(yCoords), len(timeDatas), rowCntWithoutDuplicates, tmpStartLine, allRows)
                                                 # append to csv file
-                                                writer.writerow([user, method, fileName, tmpStartLine, allRows - 2, rowCnt - 2, st.mouseMove, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17]])           #mouse move
+                                                writer.writerow([user, method, fileName, tmpStartLine, allRows - 2, rowCnt - 2, st.mouseMove, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17], angleVeloDetails[18], angleVeloDetails[19], angleVeloDetails[20], angleVeloDetails[21]])           #mouse move
                                             # empty vectors with x and y coordinates
                                             del timeDatas[:]
                                             del xCoords[:]
@@ -206,7 +205,7 @@ def processCsv(method):
                                                         #     print(user, fileName, len(xCoords), len(yCoords), len(timeDatas), rowCntWithoutDuplicates, tmpStartLine, allRows)
                                                         angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCntWithoutDuplicates)
                                                         # append to csv file
-                                                        writer.writerow([user, method, fileName, tmpStartLine, allRows - 2, rowCnt - 2, st.mouseMove, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17]])  # mouse move
+                                                        writer.writerow([user, method, fileName, tmpStartLine, allRows - 2, rowCnt - 2, st.mouseMove, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17], angleVeloDetails[18], angleVeloDetails[19], angleVeloDetails[20], angleVeloDetails[21]])  # mouse move
                                                     # empty vectors
                                                     del timeDatas[:]
                                                     del xCoords[:]
@@ -257,7 +256,7 @@ def processCsv(method):
                                                 #     print(user, fileName, len(xCoords), len(yCoords), len(timeDatas), rowCntWithoutDuplicates, tmpStartLine, allRows)
                                                 angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCntWithoutDuplicates)
                                                 # append to csv file
-                                                writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.rightClick, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17]])  # right click
+                                                writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.rightClick, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17], angleVeloDetails[18], angleVeloDetails[19], angleVeloDetails[20], angleVeloDetails[21]])  # right click
                                             # empty x and y coordinates vectors
                                             del timeDatas[:]
                                             del xCoords[:]
@@ -289,7 +288,7 @@ def processCsv(method):
                                                     #     print(user, fileName, len(xCoords), len(yCoords), len(timeDatas), rowCntWithoutDuplicates, tmpStartLine, allRows)
 
                                                     # append to csv file
-                                                    writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.leftClick, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17]])       #left click
+                                                    writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.leftClick, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17], angleVeloDetails[18], angleVeloDetails[19], angleVeloDetails[20], angleVeloDetails[21]])       #left click
                                                 # empty x and y coordinates vectors
                                                 del timeDatas[:]
                                                 del xCoords[:]
@@ -320,7 +319,7 @@ def processCsv(method):
 
                                                         angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCntWithoutDuplicates)
                                                         # append to csv file
-                                                        writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.leftDrag, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17]])    #left click drag
+                                                        writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.leftDrag, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17], angleVeloDetails[18], angleVeloDetails[19], angleVeloDetails[20], angleVeloDetails[21]])    #left click drag
                                                     # empty x and y coordinates vectors
                                                     del timeDatas[:]
                                                     del xCoords[:]
@@ -348,7 +347,7 @@ def processCsv(method):
                                                             # angle and speed datas (min, max, avg point by point)
                                                             angleVeloDetails = cf.pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, rowCntWithoutDuplicates)
                                                             # append to csv file
-                                                            writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.rightDrag, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17]]) #right click drag
+                                                            writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.rightDrag, distanceDetails[0], time, angleInRad, distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5], angleVeloDetails[6], angleVeloDetails[7], angleVeloDetails[8], angleVeloDetails[9], angleVeloDetails[10], angleVeloDetails[11], angleVeloDetails[12], angleVeloDetails[13], angleVeloDetails[14], angleVeloDetails[15], angleVeloDetails[16], angleVeloDetails[17], angleVeloDetails[18], angleVeloDetails[19], angleVeloDetails[20], angleVeloDetails[21]]) #right click drag
                                                         # empty x and y coordinates vectors
                                                         del timeDatas[:]
                                                         del xCoords[:]
@@ -378,14 +377,6 @@ def processCsv(method):
                         prevRow = row
     return
 
-processCsv('train')
+processCsv(st.method)
 
-
-#import pandas as pd
-#actiondata = pd.read_csv(st.ACTION_FILENAME)
-#actiontype = actiondata['type_of_action']
-
-#dataset = pd.read_csv(feature_filename)
-# ends with class,session,n_from,n_to
-#numFeatures = int(dataset.shape[1]) - 3  ---- shape[0] sorok szama, shape[1] oszlopok szama
-#classes = dataset.groupby('class')
+#method: 1 - train, 2 - test

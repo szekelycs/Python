@@ -1,3 +1,4 @@
+# outputFile = 'balabit_features_training_SZCS.csv'
 outputFile = 'mouse_action_summary.csv'
 classOutputFile = 'userClassification'
 #parameters for mouse move plots
@@ -9,7 +10,9 @@ timeLimit = 10
 ###################
 
 #output csv headers
-csvOutHeaders = ["user", "method", "session", "n_from", "n_to", "row_cnt", "type_of_action", "sum_dist", "elps_time", "direction", "straightness", "min_ang", "max_ang", "avg_ang", "min_velx", "max_velx", "avg_velx", "min_vely", "max_vely", "avg_vely", "min_vel", "max_vel", "avg_vel", "min_acc", "max_acc", "avg_acc", "w_min", "w_max", "w_avg"]
+csvOutHeaders = ["user", "method", "session", "n_from", "n_to", "row_cnt", "type_of_action", "sum_dist", "elps_time", "direction", "straightness", "sd_ang", "max_ang", "mean_ang", "sd_velx", "max_velx", "mean_velx", "sd_vely", "max_vely", "mean_vely", "sd_vel", "max_vel", "mean_vel", "sd_acc", "max_acc", "mean_acc", "w_sd", "w_max", "w_mean", 'jerk_std', 'jerk_max', 'jerk_mean', 'sum_angles']
+method = 1
+# 1 - train, 2 - test
 ###################
 
 #mouse move codenames

@@ -14,14 +14,18 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 # names = ["method", "user", "session", "n_from", "n_to", "rowcnt", "type_of_action", "sumdist", "elpstime", "direction", "straight", "avg_velo"]
-dataset = pandas.read_csv('mouse_action_summary.csv', skiprows=1)
+dataset = pandas.read_csv('mouse_action_summary.csv')
 array = dataset.values
 
-X = array[:,5:-1]
+X = array[:,5:]
+# print(X[1,:])
+X = X.astype('object')
+# print(X[1,:])
 Y = array[:,0]
+Y = Y.astype(int)
+# print(Y)
 
-
-validation_size = 0.20
+validation_size = 0.10
 seed = 7
 scoring = 'accuracy'
 X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size, random_state=seed)

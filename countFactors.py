@@ -1,6 +1,7 @@
 import csv
 import math
-# import scipy
+import scipy
+import numpy
 
 def countMoveDistance(xCoords, yCoords):
     distanceDetails = [None]*2
@@ -30,7 +31,6 @@ def countMoveDistance(xCoords, yCoords):
 
     return distanceDetails
 
-
 def pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, n):
     pointDatas = [None] * 23
 
@@ -41,6 +41,7 @@ def pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, n):
     veloX = []
     veloY = []
     velo = []
+    jerk = []
     w = []
     # print(len(xCoords), " ", len(yCoords), " ", len(timeDatas))
     for x, y, t in zip(xCoords, yCoords, timeDatas):
@@ -57,7 +58,7 @@ def pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, n):
         tmpTime = t - prevT
 
         # calculating angle between two dots - comparing to max and min values and reinitialize if needed
-        angles.append(math.atan2(prevY - y, prevX - x))
+        angles.append(math.degrees(math.atan2(prevY - y, prevX - x)))
 
         if tmpTime == 0:
             continue
@@ -79,6 +80,7 @@ def pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, n):
 
         if tmpTime != 0:
             acc.append((prevVelo - velo[-1])/tmpTime)
+            jerk.append(acc[-1]/tmpTime)
 
         if secondLine == False:
             prevVelo = 0
@@ -95,55 +97,65 @@ def pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, n):
         pointDatas[0] = 0
         pointDatas[1] = 0
         pointDatas[2] = 0
+        pointDatas[21] = 0
     else:
-        pointDatas[0] = min(angles)
+        pointDatas[0] = numpy.std(angles)
         pointDatas[1] = max(angles)
-        pointDatas[2] = sum(angles) / len(angles)
+        pointDatas[2] = numpy.mean(angles)
+        pointDatas[21] = sum(angles)
 
     if (len(veloX) == 0):
         pointDatas[3] = 0
         pointDatas[4] = 0
         pointDatas[5] = 0
     else:
-        pointDatas[3] = min(veloX)
+        pointDatas[3] = numpy.std(veloX)
         pointDatas[4] = max(veloX)
-        pointDatas[5] = sum(veloX) / len(veloX)
+        pointDatas[5] = numpy.mean(veloX)
 
     if (len(veloY) == 0):
         pointDatas[6] = 0
         pointDatas[7] = 0
         pointDatas[8] = 0
     else:
-        pointDatas[6] = min(veloY)
+        pointDatas[6] = numpy.std(veloY)
         pointDatas[7] = max(veloY)
-        pointDatas[8] = sum(veloY) / len(veloY)
+        pointDatas[8] = numpy.mean(veloY)
 
     if (len(velo) == 0):
         pointDatas[9] = 0
         pointDatas[10] = 0
         pointDatas[11] = 0
     else:
-        pointDatas[9] = min(velo)
+        pointDatas[9] = numpy.std(velo)
         pointDatas[10] = max(velo)
-        pointDatas[11] = sum(velo) / len(velo)
-
+        pointDatas[11] = numpy.mean(velo)
     if (len(acc) == 0):
         pointDatas[14] = 0
         pointDatas[12] = 0
         pointDatas[13] = 0
     else:
-        pointDatas[12] = min(acc)
+        pointDatas[12] = numpy.std(acc)
         pointDatas[13] = max(acc)
-        pointDatas[14] = sum(acc) / len(acc)
+        pointDatas[14] = numpy.mean(acc)
 
     if (len(w) == 0):
         pointDatas[15] = 0
         pointDatas[16] = 0
         pointDatas[17] = 0
     else:
-        pointDatas[15] = min(w)
+        pointDatas[15] = numpy.std(w)
         pointDatas[16] = max(w)
-        pointDatas[17] = sum(w) / len(w)
+        pointDatas[17] = numpy.mean(w)
+
+    if (len(jerk)) == 0:
+        pointDatas[18] = 0
+        pointDatas[19] = 0
+        pointDatas[20] = 0
+    else:
+        pointDatas[18] = numpy.std(jerk)
+        pointDatas[19] = max(jerk)
+        pointDatas[20] = numpy.std(jerk)
 
     return pointDatas
 
