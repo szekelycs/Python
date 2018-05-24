@@ -157,5 +157,5 @@ def classify(method):
                     nsc = 0
                     k = k + 1
             i = i + 1
-# classify('train')
+classify('train')
 # createBinaryClassifier('userClassification7.csv')

@@ -100,7 +100,8 @@ def pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, n):
         pointDatas[21] = 0
     else:
         pointDatas[0] = numpy.std(angles)
-        pointDatas[1] = max(angles)
+        # pointDatas[1] = float(max(angles))
+        pointDatas[1] = format(float(max(angles)), '.8f')
         pointDatas[2] = numpy.mean(angles)
         pointDatas[21] = sum(angles)
 
@@ -110,7 +111,8 @@ def pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, n):
         pointDatas[5] = 0
     else:
         pointDatas[3] = numpy.std(veloX)
-        pointDatas[4] = max(veloX)
+        pointDatas[4] = format(float(max(veloX)), '.8f')
+        # pointDatas[4] = float(max(veloX))
         pointDatas[5] = numpy.mean(veloX)
 
     if (len(veloY) == 0):
@@ -118,8 +120,9 @@ def pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, n):
         pointDatas[7] = 0
         pointDatas[8] = 0
     else:
-        pointDatas[6] = numpy.std(veloY)
-        pointDatas[7] = max(veloY)
+        pointDatas[6] = format(float(numpy.std(veloY)), '.8f')
+        # pointDatas[7] = float(max(veloY))
+        pointDatas[7] = format(float(max(veloY)), '.8f')
         pointDatas[8] = numpy.mean(veloY)
 
     if (len(velo) == 0):
@@ -128,7 +131,8 @@ def pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, n):
         pointDatas[11] = 0
     else:
         pointDatas[9] = numpy.std(velo)
-        pointDatas[10] = max(velo)
+        # pointDatas[10] = float(max(velo))
+        pointDatas[10] = format(float(max(velo)), '.8f')
         pointDatas[11] = numpy.mean(velo)
     if (len(acc) == 0):
         pointDatas[14] = 0
@@ -136,7 +140,8 @@ def pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, n):
         pointDatas[13] = 0
     else:
         pointDatas[12] = numpy.std(acc)
-        pointDatas[13] = max(acc)
+        pointDatas[13] = format(float(max(acc)), '.8f')
+        # pointDatas[13] = float(max(acc))
         pointDatas[14] = numpy.mean(acc)
 
     if (len(w) == 0):
@@ -145,7 +150,8 @@ def pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, n):
         pointDatas[17] = 0
     else:
         pointDatas[15] = numpy.std(w)
-        pointDatas[16] = max(w)
+        # pointDatas[16] = float(max(w))
+        pointDatas[16] = format(float(max(w)), '.8f')
         pointDatas[17] = numpy.mean(w)
 
     if (len(jerk)) == 0:
@@ -154,7 +160,8 @@ def pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, n):
         pointDatas[20] = 0
     else:
         pointDatas[18] = numpy.std(jerk)
-        pointDatas[19] = max(jerk)
+        pointDatas[19] = format(float(max(jerk)), '.8f')
+        # pointDatas[19] = float(max(jerk))
         pointDatas[20] = numpy.std(jerk)
 
     return pointDatas

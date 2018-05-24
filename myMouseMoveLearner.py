@@ -1,4 +1,5 @@
 import pandas
+import settings as st
 from pandas.plotting import scatter_matrix
 import matplotlib.pyplot as plt
 from sklearn import model_selection
@@ -13,17 +14,13 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
-# names = ["method", "user", "session", "n_from", "n_to", "rowcnt", "type_of_action", "sumdist", "elpstime", "direction", "straight", "avg_velo"]
-dataset = pandas.read_csv('mouse_action_summary.csv')
+names = st.csvOutHeaders
+dataset = pandas.read_csv('mouse_action_summary.csv', skiprows = 1, names = names)
 array = dataset.values
 
 X = array[:,5:]
-# print(X[1,:])
-X = X.astype('object')
-# print(X[1,:])
 Y = array[:,0]
-Y = Y.astype(int)
-# print(Y)
+
 
 validation_size = 0.10
 seed = 7

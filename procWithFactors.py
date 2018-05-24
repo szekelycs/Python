@@ -6,11 +6,11 @@ import re
 
 def processCsv(method):
 
-    with open(st.outputFile, "w+", newline='') as csvOutFile:
+    with open(st.outputTestFile, "w+", newline='') as csvOutFile:
         writer = csv.writer(csvOutFile, delimiter=',')
         writer.writerow(st.csvOutHeaders)
 
-        for dirname, dirnames, filenames in os.walk(st.trainDir):
+        for dirname, dirnames, filenames in os.walk(st.testDir):
             for fileName in filenames:
                 user = os.path.basename(dirname)
                 user = re.findall('\d+', user)[0]
@@ -379,4 +379,4 @@ def processCsv(method):
 
 processCsv(st.method)
 
-#method: 1 - train, 2 - test
+#method: 1 - train, 0 - test

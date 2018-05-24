@@ -36,7 +36,7 @@ def plotmouseaction(rowStart, rowFinish, fileName, type):
         plt.show()
 
 
-plotmouseaction(2, 83, 'session_2144641057.csv', 'mm')
+# plotmouseaction(2, 83, 'session_2144641057.csv', 'mm')
 #plotmouseaction(29679, 29693, 'session_2144641057.csv', 'lc')
 #plotmouseaction(9879, 9890, 'session_2144641057.csv', 'rc')
 # plotmouseaction(119, 125, 'session_2144641057.csv', 'ld')
