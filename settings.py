@@ -32,9 +32,9 @@ leftDrag = 3
 'rD'
 rightDrag = 4
 ###################
-# trainDir = "E:\Egyetem\Allamvizsga\Python\csvFiles"
 trainDir = 'D:\\Uni\\Allamvizsga\\Python\\csvFiles'
 testDir = 'D:\\Uni\\Allamvizsga\\Python\\test_files'
+classificationDir = 'D:\\Uni\\Allamvizsga\\Python\\classification_files\\'
 
 ###################
 # upper limit for xCoord and yCoord

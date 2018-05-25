@@ -1,7 +1,9 @@
 import settings as st
 import csv
 import numpy
+import os
 import pandas as pd
+import re
 from random import randint
 
 from pandas.plotting import scatter_matrix
@@ -18,17 +20,17 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.naive_bayes import GaussianNB
 
+
+
 def createBinaryClassifier(featureFileName):
-    dataset = pd.read_csv(featureFileName)
+    dataset = pd.read_csv(st.classificationDir + featureFileName)
     NUM_TREES = 500
     numFeatures = int(dataset.shape[1])
     array = dataset.values
-    X = array[:, 4 : numFeatures - 1]
-    Y = array[:, numFeatures - 1]
-    # X = array[:, 0 : numFeatures - 1]
-    # Y = array[:, numFeatures - 1]
+    X = array[:, 5 : numFeatures]
+    Y = array[:, 0]
 
-    print(dataset.shape)
+    # print(dataset.shape)
     validation_size = 0.20
     seed = 7
     X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size, random_state=seed)
@@ -38,16 +40,27 @@ def createBinaryClassifier(featureFileName):
     predictions = rf.predict(X_validation)
     userAccuracy = accuracy_score(Y_validation, predictions)
 
-    print(userAccuracy)
+    return userAccuracy
 
-# def loopThroughUsers(userCount):
-#     for i in userCount:
-#         createBinaryClassifier()
+def loopThroughUsers():
+    accuracy = []
+    for dirname, dirnames, filenames in os.walk(st.classificationDir):
+        for fileName in filenames:
+            # user = os.path.basename(fileName)
+            user = re.findall('\d+', fileName)[0]
+            # print(user, " ", fileName)
+            score = createBinaryClassifier(fileName)
+            accuracy.append(score)
+            print(user, " ", score)
+
 
 def classify(method):
     if method == 'train':
         result = numpy.array(list(csv.reader(open(st.outputFile))))
         result = numpy.delete(result, (0), axis=0)
+
+        if not os.path.exists(st.classificationDir):
+            os.makedirs(st.classificationDir)
 
         positionArray = []
         resultLength = len(result)
@@ -80,7 +93,7 @@ def classify(method):
             j = positionArray[i]
             if firstRow == True:
                 firstRow = False
-                outputFileName = st.classOutputFile + result[positionArray[i]][0] + '.csv'
+                outputFileName = st.classificationDir + st.classOutputFile + result[positionArray[i]][0] + '.csv'
                 with open(outputFileName, "w+", newline='') as outCSVClassifierFile:
                     writer = csv.writer(outCSVClassifierFile, delimiter=',')
                     writer.writerow(st.csvOutHeaders)
@@ -111,7 +124,7 @@ def classify(method):
                 i = i + 1
                 continue
 
-            outputFileName = st.classOutputFile + result[positionArray[i]][0] + '.csv'
+            outputFileName = st.classificationDir + st.classOutputFile + result[positionArray[i]][0] + '.csv'
             with open(outputFileName, "w+", newline='') as outCSVClassifierFile:
                 writer = csv.writer(outCSVClassifierFile, delimiter=',')
                 writer.writerow(st.csvOutHeaders)
@@ -157,5 +170,6 @@ def classify(method):
                     nsc = 0
                     k = k + 1
             i = i + 1
-classify('train')
+# classify('train')
 # createBinaryClassifier('userClassification7.csv')
+loopThroughUsers()
