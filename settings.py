@@ -6,6 +6,7 @@
 outputFile = 'mouse_action_summary.csv'
 outputTestFile = 'test_mouse_action_summary.csv'
 classOutputFile = 'userClassification'
+classOutputTestFile = 'userClassificationTest'
 #parameters for mouse move plots
 leftClickOnly = 1
 rightClickOnly = 1
@@ -35,6 +36,7 @@ rightDrag = 4
 trainDir = 'D:\\Uni\\Allamvizsga\\Python\\csvFiles'
 testDir = 'D:\\Uni\\Allamvizsga\\Python\\test_files'
 classificationDir = 'D:\\Uni\\Allamvizsga\\Python\\classification_files\\'
+classificationTestDir = 'D:\\Uni\\Allamvizsga\\Python\\classification_test_files\\'
 
 ###################
 # upper limit for xCoord and yCoord
