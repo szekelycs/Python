@@ -32,7 +32,7 @@ def countMoveDistance(xCoords, yCoords):
     return distanceDetails
 
 def pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, n):
-    pointDatas = [None] * 23
+    pointDatas = [None] * 24
 
     firstLine = secondLine = True
 
@@ -43,6 +43,8 @@ def pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, n):
     velo = []
     jerk = []
     w = []
+
+    accelerate = True
     # print(len(xCoords), " ", len(yCoords), " ", len(timeDatas))
     for x, y, t in zip(xCoords, yCoords, timeDatas):
 
@@ -56,6 +58,7 @@ def pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, n):
         tmpDistanceX = x - prevX
         tmpDistanceY = y - prevY
         tmpTime = t - prevT
+
 
         # calculating angle between two dots - comparing to max and min values and reinitialize if needed
         angles.append(math.degrees(math.atan2(prevY - y, prevX - x)))
@@ -79,6 +82,11 @@ def pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, n):
             continue
 
         if tmpTime != 0:
+            accel = (prevVelo - velo[-1])/tmpTime
+            if accel < 0 and accelerate == True:
+                pointDatas[22] = t - timeDatas[0]
+                pointDatas[23] = pointDatas[22]/(timeDatas[-1]-timeDatas[0])
+                accelerate = False
             acc.append((prevVelo - velo[-1])/tmpTime)
             jerk.append(acc[-1]/tmpTime)
 
@@ -90,6 +98,9 @@ def pointSpeedAngleAcceleration(user, fileName, xCoords, yCoords, timeDatas, n):
         prevY = y
         prevT = t
 
+    if accelerate == True:
+        pointDatas[22] = 0
+        pointDatas[23] = 0
 
 
 

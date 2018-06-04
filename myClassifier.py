@@ -12,6 +12,8 @@ from sklearn import model_selection
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
@@ -39,7 +41,18 @@ def createBinaryClassifierTestFiles(featureTrainFile, featureTestFile):
     rf = RandomForestClassifier(n_estimators=NUM_TREES)
     rf.fit(X_train, Y_train)
     predictions = rf.predict(X_validation)
-    userAccuracy = accuracy_score(Y_validation, predictions)
+    userAccuracy = accuracy_score(Y_validation, predictions) #Y_predict
+
+    print("Accuracy score")
+    print("User " + re.findall('\d+', featureTrainFile)[0], userAccuracy)
+    print("Precision score")
+    print(precision_score(Y_validation, predictions))
+    print("Recall score")
+    print(recall_score(Y_validation, predictions))
+    print("Confusion matrix")
+    print(confusion_matrix(Y_validation, predictions))
+    print("Classification report")
+    print(classification_report(Y_validation, predictions))
 
     return userAccuracy
 
@@ -51,7 +64,10 @@ def loopThroughUsersTest():
             # print(user, " ", fileName)
             score = createBinaryClassifierTestFiles(st.classificationDir + fileName, st.classificationTestDir + st.classOutputTestFile + user + '.csv')
             accuracy.append(score)
-            print(user, " ", score)
+            input("Press Enter to continue...")
+            # print(user, " ", score)
+
+
 
 
 def createBinaryClassifier(featureFileName):
@@ -72,6 +88,17 @@ def createBinaryClassifier(featureFileName):
     predictions = rf.predict(X_validation)
     userAccuracy = accuracy_score(Y_validation, predictions)
 
+    print("Accuracy score")
+    print("User " + re.findall('\d+', featureFileName)[0], userAccuracy)
+    print("Precision score")
+    print(precision_score(Y_validation, predictions))
+    print("Recall score")
+    print(recall_score(Y_validation, predictions))
+    print("Confusion matrix")
+    print(confusion_matrix(Y_validation, predictions))
+    print("Classification report")
+    print(classification_report(Y_validation, predictions))
+
     return userAccuracy
 
 def loopThroughUsersTrainFilesOnly():
@@ -83,7 +110,7 @@ def loopThroughUsersTrainFilesOnly():
             # print(user, " ", fileName)
             score = createBinaryClassifier(fileName)
             accuracy.append(score)
-            print(user, " ", score)
+            input("Press enter to continue...")
 
 
 def classify(method):
@@ -317,7 +344,9 @@ def classify(method):
                 i = i + 1
 
 
-# classify('test')
+# classify('train')
 # createBinaryClassifier('userClassification7.csv')
-# loopThroughUsersTrainFilesOnly()
+print('TRAIN')
+loopThroughUsersTrainFilesOnly()
+print('TEST')
 loopThroughUsersTest()
