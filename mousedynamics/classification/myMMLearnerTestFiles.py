@@ -1,6 +1,5 @@
 import pandas
-import settings as st
-from pandas.plotting import scatter_matrix
+from mousedynamics.utils import settings as st
 import matplotlib.pyplot as plt
 from sklearn import model_selection
 from sklearn.metrics import classification_report
@@ -13,7 +12,7 @@ from sklearn.neighbors import KNeighborsClassifier
 
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.naive_bayes import GaussianNB
-from sklearn.svm import SVC
+
 names = st.csvOutHeaders
 dataset = pandas.read_csv('mouse_action_summary.csv', skiprows = 1, names = names)
 array = dataset.values

@@ -1,7 +1,3 @@
-# TODO: 25/05/2018 - classify metódus - 'continuous' típus probléma; tesztelés teszthalmazzal
-
-
-
 # outputFile = 'balabit_features_training_SZCS.csv'
 outputFile = 'mouse_action_summary.csv'
 outputTestFile = 'test_mouse_action_summary.csv'
@@ -17,7 +13,7 @@ timeLimit = 10
 
 #output csv headers
 csvOutHeaders = ["user", "method", "session", "n_from", "n_to", "row_cnt", "type_of_action", "sum_dist", "elps_time", "direction", "straightness", "sd_ang", "max_ang", "mean_ang", "sd_velx", "max_velx", "mean_velx", "sd_vely", "max_vely", "mean_vely", "sd_vel", "max_vel", "mean_vel", "sd_acc", "max_acc", "mean_acc", "w_sd", "w_max", "w_mean", 'jerk_std', 'jerk_max', 'jerk_mean', 'sum_angles', 'pos_acc_time', 'pos_acc_time_part']
-method = 0
+method = 1
 # 1 - train, 0 - test
 ###################
 

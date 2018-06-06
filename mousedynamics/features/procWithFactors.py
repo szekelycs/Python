@@ -1,16 +1,26 @@
 import csv
-import settings as st
-import countFactors as cf
+from mousedynamics.utils import settings as st
+from mousedynamics.features import countFactors as cf
 import os
 import re
 
 def processCsv(method):
+    if method == 1: #train
+        opFile = st.outputFile
+        ipDir = st.trainDir
+    else:
+        if method == 0:
+            opFile = st.outputTestFile
+            ipDir = st.testDir
+        else:
+            print("No such method!")
+            return
 
-    with open(st.outputTestFile, "w+", newline='') as csvOutFile:
+    with open(opFile, "w+", newline='') as csvOutFile:
         writer = csv.writer(csvOutFile, delimiter=',')
         writer.writerow(st.csvOutHeaders)
 
-        for dirname, dirnames, filenames in os.walk(st.testDir):
+        for dirname, dirnames, filenames in os.walk(ipDir):
             for fileName in filenames:
                 user = os.path.basename(dirname)
                 user = re.findall('\d+', user)[0]

@@ -1,8 +1,8 @@
 import csv
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-import settings as st
-import countFactors as cf
+from mousedynamics.utils import settings as st
+
 
 # a hashmark-al elvalasztott reszek a kirajzolashoz szuksegesek - a 2500-nal nagyobb koordinatakat kiszurjuk
 ######################

@@ -1,4 +1,4 @@
-import settings as st
+from mousedynamics.utils import settings as st
 import csv
 import numpy
 import os
@@ -6,8 +6,6 @@ import pandas as pd
 import re
 from random import randint
 
-from pandas.plotting import scatter_matrix
-import matplotlib.pyplot as plt
 from sklearn import model_selection
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
@@ -15,13 +13,6 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.neighbors import KNeighborsClassifier
-
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn.naive_bayes import GaussianNB
-
 
 
 def createBinaryClassifierTestFiles(featureTrainFile, featureTestFile):
