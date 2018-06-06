@@ -105,111 +105,75 @@ def loopThroughUsersTrainFilesOnly():
 
 
 def classify(method):
-    if method == 'train':
-        result = numpy.array(list(csv.reader(open(st.outputFile))))
-        result = numpy.delete(result, (0), axis=0)
+    if method == 1:
+        ipfi = st.outputFile
+        opd = st.classificationDir
+        opf = st.classOutputFile
+    else:
+        if method == 0:
+            ipfi = st.outputTestFile
+            opd = st.classificationTestDir
+            opf = st.classOutputTestFile
+        else:
+            print('Method error')
+            return
 
-        if not os.path.exists(st.classificationDir):
-            os.makedirs(st.classificationDir)
+    result = numpy.array(list(csv.reader(open(ipfi))))
+    result = numpy.delete(result, (0), axis=0)
 
-        positionArray = []
-        resultLength = len(result)
-        firstRow = True
+    if not os.path.exists(opd):
+        os.makedirs(opd)
 
-        for i in range(resultLength):
-            if (firstRow == True):
-                prevClassifier = result[i][0]
-                positionArray.append(i)
-                firstRow = False
+    positionArray = []
+    resultLength = len(result)
+    firstRow = True
 
-            currentClassifier = result[i][0]
+    for i in range(resultLength):
+        if (firstRow == True):
+            prevClassifier = result[i][0]
+            positionArray.append(i)
+            firstRow = False
 
-            if (prevClassifier == currentClassifier):
-                prevClassifier = currentClassifier
-            else:
-                positionArray.append(i)
-                prevClassifier = currentClassifier
+        currentClassifier = result[i][0]
 
-
-        positionArray.append(resultLength - 1)
-        positionArrayLength = len(positionArray)
-
-        firstRow = True
-        i = 0
-        nsc = 0
+        if (prevClassifier == currentClassifier):
+            prevClassifier = currentClassifier
+        else:
+            positionArray.append(i)
+            prevClassifier = currentClassifier
 
 
-        while i < positionArrayLength - 1:
-            j = positionArray[i]
-            if firstRow == True:
-                firstRow = False
-                outputFileName = st.classificationDir + st.classOutputFile + result[positionArray[i]][0] + '.csv'
-                with open(outputFileName, "w+", newline='') as outCSVClassifierFile:
-                    writer = csv.writer(outCSVClassifierFile, delimiter=',')
-                    writer.writerow(st.csvOutHeaders)
+    positionArray.append(resultLength - 1)
+    positionArrayLength = len(positionArray)
 
-                    positiveSampleCount = 0
-                    while j < positionArray[i + 1]:
-                        positiveSampleCount = positiveSampleCount + 1
-                        rowToAppend = []
-                        rowToAppend.append('1')
-                        rowToAppend.extend(result[j][1:])
-                        writer.writerow(rowToAppend)
-                        j = j + 1
+    firstRow = True
+    i = 0
+    nsc = 0
 
-                    negativeSampleCount = positiveSampleCount / (positionArrayLength - 2)
-                    k = i
-                    while k < positionArrayLength - 1:
-                        startIndex = positionArray[k]
-                        endIndex = positionArray[k + 1]
-                        while nsc < negativeSampleCount:
-                            randomIndex = randint(startIndex, endIndex)
-                            rowToAppend = []
-                            rowToAppend.append('0')
-                            rowToAppend.extend(result[randomIndex][1:])
-                            writer.writerow(rowToAppend)
-                            nsc = nsc + 1
-                        nsc = 0
-                        k = k + 1
-                i = i + 1
-                continue
 
-            outputFileName = st.classificationDir + st.classOutputFile + result[positionArray[i]][0] + '.csv'
+    while i < positionArrayLength - 1:
+        j = positionArray[i]
+        if firstRow == True:
+            firstRow = False
+            outputFileName = opd + opf + result[positionArray[i]][0] + '.csv'
             with open(outputFileName, "w+", newline='') as outCSVClassifierFile:
                 writer = csv.writer(outCSVClassifierFile, delimiter=',')
                 writer.writerow(st.csvOutHeaders)
 
                 positiveSampleCount = 0
                 while j < positionArray[i + 1]:
+                    positiveSampleCount = positiveSampleCount + 1
                     rowToAppend = []
                     rowToAppend.append('1')
                     rowToAppend.extend(result[j][1:])
                     writer.writerow(rowToAppend)
                     j = j + 1
-                    positiveSampleCount = positiveSampleCount + 1
-
 
                 negativeSampleCount = positiveSampleCount / (positionArrayLength - 2)
-                k = 0
-                while k < i:
-                    startIndex = positionArray[k]
-                    endIndex = positionArray[k + 1]
-
-                    while nsc < negativeSampleCount:
-                        randomIndex = randint(startIndex, endIndex)
-                        rowToAppend = []
-                        rowToAppend.append('0')
-                        rowToAppend.extend(result[randomIndex][1:])
-                        writer.writerow(rowToAppend)
-                        nsc = nsc + 1
-                    nsc = 0
-                    k = k + 1
-
-                k = i + 1
+                k = i
                 while k < positionArrayLength - 1:
                     startIndex = positionArray[k]
                     endIndex = positionArray[k + 1]
-
                     while nsc < negativeSampleCount:
                         randomIndex = randint(startIndex, endIndex)
                         rowToAppend = []
@@ -220,124 +184,60 @@ def classify(method):
                     nsc = 0
                     k = k + 1
             i = i + 1
-    else:
-        if method == 'test':
-            result = numpy.array(list(csv.reader(open(st.outputTestFile))))
-            result = numpy.delete(result, (0), axis=0)
+            continue
 
-            if not os.path.exists(st.classificationTestDir):
-                os.makedirs(st.classificationTestDir)
+        outputFileName = opd + opf + result[positionArray[i]][0] + '.csv'
+        with open(outputFileName, "w+", newline='') as outCSVClassifierFile:
+            writer = csv.writer(outCSVClassifierFile, delimiter=',')
+            writer.writerow(st.csvOutHeaders)
 
-            positionArray = []
-            resultLength = len(result)
-            firstRow = True
-
-            for i in range(resultLength):
-                if (firstRow == True):
-                    prevClassifier = result[i][0]
-                    positionArray.append(i)
-                    firstRow = False
-
-                currentClassifier = result[i][0]
-
-                if (prevClassifier == currentClassifier):
-                    prevClassifier = currentClassifier
-                else:
-                    positionArray.append(i)
-                    prevClassifier = currentClassifier
-
-            positionArray.append(resultLength - 1)
-            positionArrayLength = len(positionArray)
-
-            firstRow = True
-            i = 0
-            nsc = 0
-
-            while i < positionArrayLength - 1:
-                j = positionArray[i]
-                if firstRow == True:
-                    firstRow = False
-                    outputFileName = st.classificationTestDir + st.classOutputTestFile + result[positionArray[i]][0] + '.csv'
-                    with open(outputFileName, "w+", newline='') as outCSVClassifierFile:
-                        writer = csv.writer(outCSVClassifierFile, delimiter=',')
-                        writer.writerow(st.csvOutHeaders)
-
-                        positiveSampleCount = 0
-                        while j < positionArray[i + 1]:
-                            positiveSampleCount = positiveSampleCount + 1
-                            rowToAppend = []
-                            rowToAppend.append('1')
-                            rowToAppend.extend(result[j][1:])
-                            writer.writerow(rowToAppend)
-                            j = j + 1
-
-                        negativeSampleCount = positiveSampleCount / (positionArrayLength - 2)
-                        k = i
-                        while k < positionArrayLength - 1:
-                            startIndex = positionArray[k]
-                            endIndex = positionArray[k + 1]
-                            while nsc < negativeSampleCount:
-                                randomIndex = randint(startIndex, endIndex)
-                                rowToAppend = []
-                                rowToAppend.append('0')
-                                rowToAppend.extend(result[randomIndex][1:])
-                                writer.writerow(rowToAppend)
-                                nsc = nsc + 1
-                            nsc = 0
-                            k = k + 1
-                    i = i + 1
-                    continue
-
-                outputFileName = st.classificationTestDir + st.classOutputTestFile + result[positionArray[i]][0] + '.csv'
-                with open(outputFileName, "w+", newline='') as outCSVClassifierFile:
-                    writer = csv.writer(outCSVClassifierFile, delimiter=',')
-                    writer.writerow(st.csvOutHeaders)
-
-                    positiveSampleCount = 0
-                    while j < positionArray[i + 1]:
-                        rowToAppend = []
-                        rowToAppend.append('1')
-                        rowToAppend.extend(result[j][1:])
-                        writer.writerow(rowToAppend)
-                        j = j + 1
-                        positiveSampleCount = positiveSampleCount + 1
-
-                    negativeSampleCount = positiveSampleCount / (positionArrayLength - 2)
-                    k = 0
-                    while k < i:
-                        startIndex = positionArray[k]
-                        endIndex = positionArray[k + 1]
-
-                        while nsc < negativeSampleCount:
-                            randomIndex = randint(startIndex, endIndex)
-                            rowToAppend = []
-                            rowToAppend.append('0')
-                            rowToAppend.extend(result[randomIndex][1:])
-                            writer.writerow(rowToAppend)
-                            nsc = nsc + 1
-                        nsc = 0
-                        k = k + 1
-
-                    k = i + 1
-                    while k < positionArrayLength - 1:
-                        startIndex = positionArray[k]
-                        endIndex = positionArray[k + 1]
-
-                        while nsc < negativeSampleCount:
-                            randomIndex = randint(startIndex, endIndex)
-                            rowToAppend = []
-                            rowToAppend.append('0')
-                            rowToAppend.extend(result[randomIndex][1:])
-                            writer.writerow(rowToAppend)
-                            nsc = nsc + 1
-                        nsc = 0
-                        k = k + 1
-                i = i + 1
+            positiveSampleCount = 0
+            while j < positionArray[i + 1]:
+                rowToAppend = []
+                rowToAppend.append('1')
+                rowToAppend.extend(result[j][1:])
+                writer.writerow(rowToAppend)
+                j = j + 1
+                positiveSampleCount = positiveSampleCount + 1
 
 
-# classify('train')
+            negativeSampleCount = positiveSampleCount / (positionArrayLength - 2)
+            k = 0
+            while k < i:
+                startIndex = positionArray[k]
+                endIndex = positionArray[k + 1]
+
+                while nsc < negativeSampleCount:
+                    randomIndex = randint(startIndex, endIndex)
+                    rowToAppend = []
+                    rowToAppend.append('0')
+                    rowToAppend.extend(result[randomIndex][1:])
+                    writer.writerow(rowToAppend)
+                    nsc = nsc + 1
+                nsc = 0
+                k = k + 1
+
+            k = i + 1
+            while k < positionArrayLength - 1:
+                startIndex = positionArray[k]
+                endIndex = positionArray[k + 1]
+
+                while nsc < negativeSampleCount:
+                    randomIndex = randint(startIndex, endIndex)
+                    rowToAppend = []
+                    rowToAppend.append('0')
+                    rowToAppend.extend(result[randomIndex][1:])
+                    writer.writerow(rowToAppend)
+                    nsc = nsc + 1
+                nsc = 0
+                k = k + 1
+        i = i + 1
+
+
+# classify(0)
+# 1 - train, 0 - test
 # createBinaryClassifier('userClassification7.csv')
-print('TRAIN')
-loopThroughUsersTrainFilesOnly()
-print('TEST')
-loopThroughUsersTest()
+# print('TRAIN')
+# loopThroughUsersTrainFilesOnly()
+# print('TEST')
+# loopThroughUsersTest()
