@@ -388,5 +388,9 @@ def processCsv(method):
     return
 
 processCsv(st.method)
+# processCsv(1)
+# processCsv(0)
+
+
 
 #method: 1 - train, 0 - test

@@ -9,7 +9,7 @@ from mousedynamics.utils import settings as st
 ######################
 ######################
 
-def processCsv(fileName):
+def plotSession(fileName):
 
     with open(fileName) as csvfile:
         reader = csv.reader(csvfile)
@@ -26,10 +26,10 @@ def processCsv(fileName):
         xCoords = []                            # necessary at plotting - contains the x coords of the mouse position
         yCoords = []                            # necessary at plotting - contains the y coords of the mouse position
 
-        mm = mpatches.Patch(color='red', label='Mouse Move - MM')
-        rc = mpatches.Patch(color='black', label='Right Click - RC')
-        lc = mpatches.Patch(color='lightblue', label='Left Click - LC')
-        ld = mpatches.Patch(color='green', label='Left Click Drag - LD')
+        mm = mpatches.Patch(color=st.colorMM, label='Mouse Move - MM')
+        rc = mpatches.Patch(color=st.colorRC, label='Right Click - RC')
+        lc = mpatches.Patch(color=st.colorLC, label='Left Click - LC')
+        ld = mpatches.Patch(color=st.colorDD, label='Left Click Drag - LD')
         # rd = mpatches.Patch(color='magenta', label='Right Click Drag - RD')
 
         plt.legend(handles=[mm, rc, lc, ld])
@@ -62,7 +62,7 @@ def processCsv(fileName):
                     #print("Action - MOVE, rowcount: ", rowCnt, " ; n-from: ", tmpStartLine, " ; n-to: ", allRows)
                     rowCnt = 0  # else nothing happens
                     if st.moveOnly == 1:
-                        plt.plot(xCoords, yCoords, linestyle='-', color='red', markersize=0.8, linewidth=0.1, marker='.')
+                        plt.plot(xCoords, yCoords, linestyle='-', color=st.colorMM, markersize=0.8, linewidth=0.1, marker='.')
                     del xCoords[:]
                     del yCoords[:]
             else:
@@ -94,7 +94,7 @@ def processCsv(fileName):
                             leftPressed = 0
 
                             if st.moveOnly == 1:
-                                plt.plot(xCoords, yCoords, linestyle='-', linewidth=0.1, markersize=0.8, color='red', marker='.')
+                                plt.plot(xCoords, yCoords, linestyle='-', linewidth=0.1, markersize=0.8, color=st.colorMM, marker='.')
                             del xCoords[:]
                             del yCoords[:]
 
@@ -117,7 +117,7 @@ def processCsv(fileName):
                                 rightPressed = 0
 
                                 if st.moveOnly == 1:
-                                    plt.plot(xCoords, yCoords, linestyle='-', linewidth=0.1, markersize=0.8, color='red', marker='.')
+                                    plt.plot(xCoords, yCoords, linestyle='-', linewidth=0.1, markersize=0.8, color=st.colorMM, marker='.')
                                 del xCoords[:]
                                 del yCoords[:]
 
@@ -139,7 +139,7 @@ def processCsv(fileName):
                                 rowCnt = 0
 
                                 if st.rightClickOnly == 1:
-                                    plt.plot(xCoords, yCoords, linestyle='-', color='black', linewidth=0.1, markersize=0.8, marker='.')
+                                    plt.plot(xCoords, yCoords, linestyle='-', color=st.colorRC, linewidth=0.1, markersize=0.8, marker='.')
                                 del xCoords[:]
                                 del yCoords[:]
                             else:
@@ -149,7 +149,7 @@ def processCsv(fileName):
                                     rowCnt = 0
 
                                     if st.leftClickOnly == 1:
-                                        plt.plot(xCoords, yCoords, linestyle='-', color='lightblue', linewidth=0.2, markersize=0.8, marker='.')
+                                        plt.plot(xCoords, yCoords, linestyle='-', color=st.colorLC, linewidth=0.2, markersize=0.8, marker='.')
                                     del xCoords[:]
                                     del yCoords[:]
                                 else:
@@ -159,7 +159,7 @@ def processCsv(fileName):
                                         rowCnt = 0
 
                                         if st.dragOnly == 1:
-                                            plt.plot(xCoords, yCoords, linestyle='-', color='green', linewidth=0.1, markersize=0.8, marker='.')
+                                            plt.plot(xCoords, yCoords, linestyle='-', color=st.colorDD, linewidth=0.1, markersize=0.8, marker='.')
                                         del xCoords[:]
                                         del yCoords[:]
                                     else:
@@ -169,7 +169,7 @@ def processCsv(fileName):
                                             rowCnt = 0
 
                                             if st.dragOnly == 1:
-                                                plt.plot(xCoords, yCoords, linestyle='-', color='magenta', linewidth=0.1, markersize=0.8, marker='.')
+                                                plt.plot(xCoords, yCoords, linestyle='-', color=st.colorDD, linewidth=0.1, markersize=0.8, marker='.')
                                             del xCoords[:]
                                             del yCoords[:]
                                         else:
@@ -178,7 +178,7 @@ def processCsv(fileName):
         plt.show()
         return
 
-processCsv('session_0061629194.csv')
+plotSession('session_0061629194.csv')
 
 
 #import pandas as pd

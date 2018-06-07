@@ -234,10 +234,10 @@ def classify(method):
         i = i + 1
 
 
-# classify(0)
+classify(0)
+classify(1)
 # 1 - train, 0 - test
-# createBinaryClassifier('userClassification7.csv')
-# print('TRAIN')
-# loopThroughUsersTrainFilesOnly()
-# print('TEST')
-# loopThroughUsersTest()
+print('TRAIN')
+loopThroughUsersTrainFilesOnly()
+print('TEST')
+loopThroughUsersTest()

@@ -17,7 +17,14 @@ method = 1
 # 1 - train, 0 - test
 ###################
 
-#mouse move codenames
+#mouse action colors for plotting
+colorMM = 'red'
+colorLC = 'blue'
+colorRC = 'green'
+colorDD = 'black'
+
+
+#mouse action codenames
 'mm'
 mouseMove = 0
 'lc'

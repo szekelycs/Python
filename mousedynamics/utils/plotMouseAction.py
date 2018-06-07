@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import mousedynamics.utils.settings as st
 import csv
 
 def plotmouseaction(rowStart, rowFinish, fileName, type):
@@ -13,24 +14,21 @@ def plotmouseaction(rowStart, rowFinish, fileName, type):
             yCoords.append(float(rows[i][5]))
 
         if type == 'mm':
-            plt.plot(xCoords, yCoords, linestyle='-', linewidth=0.5, markersize=3, color='red', marker='*')
+            plt.plot(xCoords, yCoords, linestyle='-', linewidth=0.5, markersize=3, color= st.colorMM, marker='*')
             plt.axis([0, 2100, 0, 1200])
         else:
             if type == 'lc':
-                plt.plot(xCoords, yCoords, linestyle='-', linewidth=0.5, markersize=3, color='blue', marker='o')
+                plt.plot(xCoords, yCoords, linestyle='-', linewidth=0.5, markersize=3, color=st.colorLC, marker='o')
                 plt.axis([0, 2100, 0, 1200])
             else:
                 if type == 'rc':
-                    plt.plot(xCoords, yCoords, linestyle='-', linewidth=0.5, markersize=3, color='green', marker='.')
+                    plt.plot(xCoords, yCoords, linestyle='-', linewidth=0.5, markersize=3, color=st.colorRC, marker='.')
                     plt.axis([0, 2100, 0, 1200])
                 else:
                     if type == 'ld':
-                        plt.plot(xCoords, yCoords, linestyle='-', linewidth=0.5, markersize=3, color='black', marker='^')
+                        plt.plot(xCoords, yCoords, linestyle='-', linewidth=0.5, markersize=3, color=st.colorDD, marker='^')
                         plt.axis([0, 2100, 0, 1200])
-                    else:
-                        if type == 'rd':
-                            plt.plot(xCoords, yCoords, linestyle='-', linewidth=0.5, markersize=3, color='magenta', marker='8')
-                            plt.axis([0, 2100, 0, 1200])
+
         del xCoords[:]
         del yCoords[:]
         plt.show()
