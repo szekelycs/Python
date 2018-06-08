@@ -61,6 +61,7 @@ def loopThroughUsersTest():
 
 
 
+
 def createBinaryClassifier(featureFileName):
     dataset = pd.read_csv(st.classificationDir + featureFileName)
     NUM_TREES = 500
@@ -104,6 +105,11 @@ def loopThroughUsersTrainFilesOnly():
             input("Press enter to continue...")
 
 
+def createSessionClassifier():
+    ipfi = st.outputTestFile
+
+    return
+
 def classify(method):
     if method == 1:
         ipfi = st.outputFile
@@ -145,7 +151,8 @@ def classify(method):
 
     positionArray.append(resultLength - 1)
     positionArrayLength = len(positionArray)
-
+    print(positionArray)
+    return
     firstRow = True
     i = 0
     nsc = 0
@@ -234,10 +241,10 @@ def classify(method):
         i = i + 1
 
 
-classify(0)
 classify(1)
-# 1 - train, 0 - test
-print('TRAIN')
-loopThroughUsersTrainFilesOnly()
-print('TEST')
-loopThroughUsersTest()
+# classify(1)
+# # 1 - train, 0 - test
+# print('TRAIN')
+# loopThroughUsersTrainFilesOnly()
+# print('TEST')
+# loopThroughUsersTest()
