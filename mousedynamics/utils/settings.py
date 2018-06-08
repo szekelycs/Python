@@ -1,9 +1,16 @@
 # outputFile = 'balabit_features_training_SZCS.csv'
 outputFile = 'mouse_action_summary.csv'
 outputTestFile = 'test_mouse_action_summary.csv'
+outputLegalTestFile = 'legal_test_mouse_action_summary.csv'
+outputIllegalTestFile = 'illegal_test_mouse_action_summary.csv'
+
 publicLabels = 'public_labels.csv'
 classOutputFile = 'userClassification'
 classOutputTestFile = 'userClassificationTest'
+
+classOutputLegalTestFile = 'userClassificationLegalTest'
+classOutputIllegalTestFile = 'userClassificationIllegalTest'
+
 #parameters for mouse move plots
 leftClickOnly = 1
 rightClickOnly = 1
@@ -16,6 +23,9 @@ timeLimit = 10
 csvOutHeaders = ["user", "method", "session", "n_from", "n_to", "row_cnt", "type_of_action", "sum_dist", "elps_time", "direction", "straightness", "sd_ang", "max_ang", "mean_ang", "sd_velx", "max_velx", "mean_velx", "sd_vely", "max_vely", "mean_vely", "sd_vel", "max_vel", "mean_vel", "sd_acc", "max_acc", "mean_acc", "w_sd", "w_max", "w_mean", 'jerk_std', 'jerk_max', 'jerk_mean', 'sum_angles', 'pos_acc_time', 'pos_acc_time_part']
 method = 1
 testMethod = 0
+
+legalTestMethod = 2
+illegalTestMethod = 3
 # 1 - train, 0 - test
 ###################
 
@@ -42,6 +52,12 @@ trainDir = 'D:\\Uni\\Allamvizsga\\Python\\csvFiles'
 testDir = 'D:\\Uni\\Allamvizsga\\Python\\test_files'
 classificationDir = 'D:\\Uni\\Allamvizsga\\Python\\classification_files\\'
 classificationTestDir = 'D:\\Uni\\Allamvizsga\\Python\\classification_test_files\\'
+
+classificationLegalTestDir = 'D:\\Uni\\Allamvizsga\\Python\\classification_legal_test_files\\'
+classificationIllegalTestDir = 'D:\\Uni\\Allamvizsga\\Python\\classification_illegal_test_files\\'
+
+legalTestSessionCopy = 'D:\\Uni\\Allamvizsga\\Python\\legal_test_files\\'
+illegalTestSessionCopy = 'D:\\Uni\\Allamvizsga\\Python\\illegal_test_files\\'
 
 legalOpDir = 'D:\\Uni\\Allamvizsga\\Python\\legalSessionsFeatures\\'
 illegalOpDir = 'D:\\Uni\\Allamvizsga\\Python\\illegalSessionsFeatures\\'

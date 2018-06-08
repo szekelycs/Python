@@ -14,8 +14,92 @@ from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.ensemble import RandomForestClassifier
 
+def testSessionForUser(rf, user, featureTestFile, legality):
+    # trainDataset = pd.read_csv(featureTrainFile)
+    # NUM_TREES = 500
+    # numFeaturesTrain = int(trainDataset.shape[1])
+    # trainArray = trainDataset.values
+    # X_train = trainArray[:, 5: numFeaturesTrain]
+    # Y_train = trainArray[:, 0]
 
-def createBinaryClassifierTestFiles(featureTrainFile, featureTestFile):
+    testDataset = pd.read_csv(featureTestFile)
+    numFeaturesTest = int(testDataset.shape[1])
+    testArray = testDataset.values
+    X_validation = testArray[:, 5: numFeaturesTest]
+    Y_validation = []
+
+    XValLength = len(X_validation)
+    if(legality == 1):
+        print("LEGAL SCORES")
+        p = 'legal'
+        for i in range(0, XValLength):
+            Y_validation.append(1)
+    else:
+        print("ILLEGAL SCORES")
+        p = 'illegal'
+        for i in range(0, XValLength):
+            Y_validation.append(0)
+
+    # rf = RandomForestClassifier(n_estimators=NUM_TREES)
+    # rf.fit(X_train, Y_train)
+    predictions = rf.predict(X_validation)
+    userAccuracy = accuracy_score(Y_validation, predictions)  # Y_predict
+
+
+
+    print("Accuracy score")
+    print("User " + re.findall('\d+', user)[0], userAccuracy, p)
+    # print("Precision score")
+    # print(precision_score(Y_validation, predictions))
+    # print("Recall score")
+    # print(recall_score(Y_validation, predictions))
+    # print("Confusion matrix")
+    # print(confusion_matrix(Y_validation, predictions))
+    # print("Classification report")
+    # print(classification_report(Y_validation, predictions))
+
+    # return userAccuracy
+# testSessionForUser(st.classificationDir + 'userClassification7.csv', st.legalOpDir + '7\\session_1244242475', 1)
+
+def loopThroughLegalIllegal(legality):
+    accuracy = []
+    if legality == 1:
+        walkDir = st.legalOpDir
+    else:
+        walkDir = st.illegalOpDir
+    for dirname, dirnames, filenames in os.walk(st.classificationDir):
+        for fileName in filenames:
+            user = re.findall('\d+', fileName)[0]
+            trainDataset = pd.read_csv(st.classificationDir + fileName)
+            NUM_TREES = 500
+            numFeaturesTrain = int(trainDataset.shape[1])
+            trainArray = trainDataset.values
+            X_train = trainArray[:, 5: numFeaturesTrain]
+            Y_train = trainArray[:, 0]
+
+            rf = RandomForestClassifier(n_estimators=NUM_TREES)
+            rf.fit(X_train, Y_train)
+
+            for dirnameTest, dirnamesTest, filenamesTest in os.walk(walkDir):
+                for testDirName in dirnamesTest:
+                    if testDirName == user:
+                        for d1, d2, testFileNamesInTmpDir in os.walk(walkDir + testDirName):
+                            for testFileNameInTmpDir in testFileNamesInTmpDir:
+                                # print(walkDir, testDirName, testFileNameInTmpDir)
+                                testSessionForUser(rf, user, walkDir + user + "\\" + testFileNameInTmpDir, legality)
+
+
+
+
+loopThroughLegalIllegal(0)
+
+####################################################################################
+####################################################################################
+####################################################################################
+####################################################################################
+# TEST TEST TEST #
+
+def createBinaryClassifierTestFiles(featureTrainFile, featureTestFile, method):
     trainDataset = pd.read_csv(featureTrainFile)
     NUM_TREES = 500
     numFeaturesTrain = int(trainDataset.shape[1])
@@ -34,6 +118,11 @@ def createBinaryClassifierTestFiles(featureTrainFile, featureTestFile):
     predictions = rf.predict(X_validation)
     userAccuracy = accuracy_score(Y_validation, predictions) #Y_predict
 
+    if method == 1:
+        print("LEGAL SCORES")
+    else:
+        print("ILLEGAL SCORES")
+
     print("Accuracy score")
     print("User " + re.findall('\d+', featureTrainFile)[0], userAccuracy)
     print("Precision score")
@@ -47,19 +136,26 @@ def createBinaryClassifierTestFiles(featureTrainFile, featureTestFile):
 
     return userAccuracy
 
+
 def loopThroughUsersTest():
     accuracy = []
     for dirname, dirnames, filenames in os.walk(st.classificationDir):
         for fileName in filenames:
             user = re.findall('\d+', fileName)[0]
             # print(user, " ", fileName)
-            score = createBinaryClassifierTestFiles(st.classificationDir + fileName, st.classificationTestDir + st.classOutputTestFile + user + '.csv')
-            accuracy.append(score)
-            input("Press Enter to continue...")
-            # print(user, " ", score)
+            score1 = createBinaryClassifierTestFiles(st.classificationDir + fileName, st.classificationLegalTestDir + st.classOutputLegalTestFile + user + '.csv', 1)
+            score2 = createBinaryClassifierTestFiles(st.classificationDir + fileName, st.classificationIllegalTestDir + st.classOutputIllegalTestFile + user + '.csv', 0)
+            accuracy.append(score1)
+            accuracy.append(score2)
+            # input("Press Enter to continue...")
+            # print(user, " legal: ", score1, " illegal: ", score2)
 
 
-
+####################################################################################
+####################################################################################
+####################################################################################
+####################################################################################
+#  TRAIN TRAIN TRAIN #
 
 
 def createBinaryClassifier(featureFileName):
@@ -79,6 +175,7 @@ def createBinaryClassifier(featureFileName):
     rf.fit(X_train, Y_train)
     predictions = rf.predict(X_validation)
     userAccuracy = accuracy_score(Y_validation, predictions)
+
 
     print("Accuracy score")
     print("User " + re.findall('\d+', featureFileName)[0], userAccuracy)
@@ -104,11 +201,12 @@ def loopThroughUsersTrainFilesOnly():
             accuracy.append(score)
             input("Press enter to continue...")
 
+####################################################################################
+####################################################################################
+####################################################################################
+####################################################################################
+# BINARY CLASSIFIER CREATOR #
 
-def createSessionClassifier():
-    ipfi = st.outputTestFile
-
-    return
 
 def classify(method):
     if method == 1:
@@ -121,8 +219,19 @@ def classify(method):
             opd = st.classificationTestDir
             opf = st.classOutputTestFile
         else:
-            print('Method error')
-            return
+            if method == 2:
+                ipfi = st.outputLegalTestFile
+                opd = st.classificationLegalTestDir
+                opf = st.classOutputLegalTestFile
+            else:
+                if method == 3:
+                    ipfi = st.outputIllegalTestFile
+                    opd = st.classificationIllegalTestDir
+                    opf = st.classOutputIllegalTestFile
+                else:
+                    print('Method error')
+                    return
+
 
     result = numpy.array(list(csv.reader(open(ipfi))))
     result = numpy.delete(result, (0), axis=0)
@@ -151,8 +260,8 @@ def classify(method):
 
     positionArray.append(resultLength - 1)
     positionArrayLength = len(positionArray)
-    print(positionArray)
-    return
+    # print(positionArray)
+
     firstRow = True
     i = 0
     nsc = 0
@@ -240,8 +349,16 @@ def classify(method):
                 k = k + 1
         i = i + 1
 
+####################################################################################
+####################################################################################
+####################################################################################
+####################################################################################
 
-classify(1)
+# CALL SOME METHODS #
+
+
+# classify(2)
+# classify(3)
 # classify(1)
 # # 1 - train, 0 - test
 # print('TRAIN')

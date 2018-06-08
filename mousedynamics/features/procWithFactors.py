@@ -4,6 +4,58 @@ from mousedynamics.features import countFactors as cf
 import os
 import re
 import pandas as pd
+from shutil import copyfile
+
+
+def createTestCsvEachSession():
+    ipDir = st.testDir
+    legalOpDir = st.legalOpDir
+    illegalOpDir = st.illegalOpDir
+    dataset = pd.read_csv(st.publicLabels)
+    fileNames = dataset.values
+
+    method = st.testMethod
+
+    legalSessions = []
+    illegalSessions = []
+
+    for i in fileNames:
+        if i[1] == 0:
+            legalSessions.append(i[0])
+        else:
+            if i[1] == 1:
+                illegalSessions.append(i[0])
+            else:
+                print(i[0], ' file legality error.')
+                continue;
+
+    if not os.path.exists(legalOpDir) or not os.path.exists(illegalOpDir):
+        os.makedirs(legalOpDir)
+        os.makedirs(illegalOpDir)
+
+    for dirname, dirnames, filenames in os.walk(ipDir):
+        for fileName in filenames:
+            user = os.path.basename(dirname)
+            user = re.findall('\d+', user)[0]
+
+            if fileName in legalSessions:
+                if not os.path.exists(legalOpDir + '\\' + user):
+                    os.makedirs(legalOpDir + '\\' + user)
+
+                csvOutFile = legalOpDir + '\\' + user + '\\' + fileName
+                countFeaturesInCsv(dirname, fileName, user, method, csvOutFile)
+            else:
+                if not os.path.exists(illegalOpDir + '\\' + user):
+                    os.makedirs(illegalOpDir + '\\' + user)
+                csvOutFile = illegalOpDir + '\\' + user + '\\' + fileName
+                countFeaturesInCsv(dirname, fileName, user, method, csvOutFile)
+    return
+
+
+####################################################################################
+####################################################################################
+####################################################################################
+####################################################################################
 
 def countFeaturesInCsv(dirname, fileName, user, method, opFile):
     with open(opFile, "w+", newline='') as csvOutFile:
@@ -483,10 +535,16 @@ def countFeaturesInCsv(dirname, fileName, user, method, opFile):
                 prevRow = row
     return
 
-def createTestCsvEachSession():
+####################################################################################
+####################################################################################
+####################################################################################
+####################################################################################
+
+
+def sortLegalAndIllegalCsv():
     ipDir = st.testDir
-    legalOpDir = st.legalOpDir
-    illegalOpDir = st.illegalOpDir
+    legalOpDir = st.legalTestSessionCopy
+    illegalOpDir = st.illegalTestSessionCopy
     dataset = pd.read_csv(st.publicLabels)
     fileNames = dataset.values
 
@@ -494,6 +552,10 @@ def createTestCsvEachSession():
 
     legalSessions = []
     illegalSessions = []
+
+    if not os.path.exists(legalOpDir) or not os.path.exists(illegalOpDir):
+        os.makedirs(legalOpDir)
+        os.makedirs(illegalOpDir)
 
     for i in fileNames:
         if i[1] == 0:
@@ -505,10 +567,6 @@ def createTestCsvEachSession():
                 print(i[0], ' file legality error.')
                 continue;
 
-    if not os.path.exists(legalOpDir) or not os.path.exists(illegalOpDir):
-        os.makedirs(legalOpDir)
-        os.makedirs(illegalOpDir)
-
     for dirname, dirnames, filenames in os.walk(ipDir):
         for fileName in filenames:
             user = os.path.basename(dirname)
@@ -517,29 +575,39 @@ def createTestCsvEachSession():
             if fileName in legalSessions:
                 if not os.path.exists(legalOpDir + '\\' + user):
                     os.makedirs(legalOpDir + '\\' + user)
-
-                csvOutFile = legalOpDir + '\\' + user + '\\' + fileName
-                countFeaturesInCsv(dirname, fileName, user, method, csvOutFile)
+                copyfile(dirname + '\\' + fileName, legalOpDir + '\\' + user + '\\' + fileName)
             else:
-                if not os.path.exists(illegalOpDir + '\\' + user):
-                    os.makedirs(illegalOpDir + '\\' + user)
-                csvOutFile = illegalOpDir + '\\' + user + '\\' + fileName
-                countFeaturesInCsv(dirname, fileName, user, method, csvOutFile)
-    return
+                if fileName in illegalSessions:
+                    if not os.path.exists(illegalOpDir + '\\' + user):
+                        os.makedirs(illegalOpDir + '\\' + user)
+                    copyfile(dirname + '\\' + fileName, illegalOpDir + '\\' + user + '\\' + fileName)
 
-createTestCsvEachSession()
+####################################################################################
+####################################################################################
+####################################################################################
+####################################################################################
+
 
 def processCsv(method):
+
     if method == 1: #train
         opFile = st.outputFile
         ipDir = st.trainDir
     else:
-        if method == 0:
+        if method == 0: #test
             opFile = st.outputTestFile
             ipDir = st.testDir
         else:
-            print("No such method!")
-            return
+            if method == 2: #legalTestFiles
+                opFile = st.outputLegalTestFile
+                ipDir = st.legalTestSessionCopy
+            else:
+                if method == 3: #illegalTestFiles
+                    opFile = st.outputIllegalTestFile
+                    ipDir = st.illegalTestSessionCopy
+                else:
+                    print("No such method!")
+                    return
 
     with open(opFile, "w+", newline='') as csvOutFile:
         writer = csv.writer(csvOutFile, delimiter=',')
@@ -912,10 +980,20 @@ def processCsv(method):
                         prevRow = row
     return
 
-# processCsv(st.method)
+####################################################################################
+####################################################################################
+####################################################################################
+####################################################################################
+
+
+
 # processCsv(1)
 # processCsv(0)
-
-
-
+processCsv(st.legalTestMethod)
+processCsv(st.illegalTestMethod)
+# createTestCsvEachSession()
+# sortLegalAndIllegalCsv()
 #method: 1 - train, 0 - test
+
+
+
