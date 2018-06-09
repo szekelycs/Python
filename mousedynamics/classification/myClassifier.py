@@ -5,6 +5,10 @@ import os
 import pandas as pd
 import re
 from random import randint
+import matplotlib.pyplot as plt
+
+from scipy.interpolate import interp1d
+from scipy.optimize import brentq
 
 from sklearn import model_selection
 from sklearn.metrics import classification_report
@@ -13,6 +17,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.ensemble import RandomForestClassifier
+import sklearn.metrics as metrics
 
 
 
@@ -89,8 +94,6 @@ def testSessionForUser(rf, user, featureTestFile, legality):
     # rf.fit(X_train, Y_train)
     predictions = rf.predict(X_validation)
     userAccuracy = accuracy_score(Y_validation, predictions)  # Y_predict
-
-
 
     print("Accuracy score")
     print("User " + re.findall('\d+', user)[0], userAccuracy, p)
@@ -203,6 +206,7 @@ def loopThroughUsersTest():
 #  TRAIN TRAIN TRAIN #
 
 
+
 def createBinaryClassifier(featureFileName):
     dataset = pd.read_csv(st.classificationDir + featureFileName)
     NUM_TREES = 500
@@ -218,9 +222,9 @@ def createBinaryClassifier(featureFileName):
 
     rf = RandomForestClassifier(n_estimators=NUM_TREES)
     rf.fit(X_train, Y_train)
+
     predictions = rf.predict(X_validation)
     userAccuracy = accuracy_score(Y_validation, predictions)
-
 
     print("Accuracy score")
     print("User " + re.findall('\d+', featureFileName)[0], userAccuracy)
@@ -233,23 +237,117 @@ def createBinaryClassifier(featureFileName):
     print("Classification report")
     print(classification_report(Y_validation, predictions))
 
-    return userAccuracy
-
 def loopThroughUsersTrainFilesOnly():
     accuracy = []
     for dirname, dirnames, filenames in os.walk(st.classificationDir):
         for fileName in filenames:
             # user = os.path.basename(fileName)
-            user = re.findall('\d+', fileName)[0]
+            # user = re.findall('\d+', fileName)[0]
             # print(user, " ", fileName)
             score = createBinaryClassifier(fileName)
             accuracy.append(score)
+
             input("Press enter to continue...")
 
 ####################################################################################
 ####################################################################################
 ####################################################################################
 ####################################################################################
+
+
+
+
+
+def plotAUC(data_no, user ):
+    labels_no = data_no['label']
+    scores_no = data_no['score']
+    auc_value_no =   metrics.roc_auc_score(numpy.array(labels_no), numpy.array(scores_no) )
+
+    fpr_no, tpr_no, thresholds_no = metrics.roc_curve(labels_no, scores_no, pos_label=1)
+    eer_no = brentq(lambda x: 1. - x - interp1d(fpr_no, tpr_no)(x), 0., 1.)
+    print("System AUC", auc_value_no)
+    print("System EER:",eer_no)
+    #meghatározza az eer_no értékhez tartozó küszöbértéket
+    thresh_no = interp1d(fpr_no, thresholds_no)(eer_no)
+    print(thresh_no)
+
+
+
+    # plt.figure()
+    # lw = 2
+    # plt.plot(fpr_no,     tpr_no,     color='black', lw=lw, label='AUC = %0.4f' % auc_value_no)
+    # plt.plot([0, 1], [0, 1], color='darkorange', lw=lw, linestyle='--')
+    # plt.xlim([0.0, 1.0])
+    # plt.ylim([0.0, 1.05])
+    # plt.xlabel('False Positive Rate')
+    # plt.ylabel('True Positive Rate')
+    # plt.title('AUC')
+    # plt.legend(loc="lower right")
+    # plt.show(block = False)
+    return thresh_no
+
+
+def tresholdUtil(featureFileName):
+    dataset = pd.read_csv(st.classificationDir + featureFileName)
+    NUM_TREES = 500
+    numFeatures = int(dataset.shape[1])
+    array = dataset.values
+    X = array[:, 5 : numFeatures]
+    Y = array[:, 0]
+
+
+    # print(dataset.shape)
+    validation_size = 0.20
+    seed = 7
+    X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size, random_state=seed)
+
+    yValShape = Y_validation.shape[0]
+    scoreArray = numpy.zeros((yValShape, 2))
+
+    rf = RandomForestClassifier(n_estimators=NUM_TREES)
+    rf.fit(X_train, Y_train)
+
+    scores = rf.predict_proba(X_validation)
+
+    for i, j, k in zip(Y_validation, scores, range(0, yValShape)):
+        scoreArray[k][0] = i
+        scoreArray[k][1] = j[1]
+
+    return scoreArray
+
+
+
+def calculateTresholds():
+    accuracy = []
+    with open(st.thresholdFile, "w+", newline='') as opCsv:
+        writer = csv.writer(opCsv, delimiter=',')
+        for dirname, dirnames, filenames in os.walk(st.classificationDir):
+            for fileName in filenames:
+                user = os.path.basename(fileName)
+                user = re.findall('\d+', fileName)[0]
+                print(user, " ", fileName)
+                # score = createBinaryClassifier(fileName)
+                # accuracy.append(score)
+                ppscore = tresholdUtil(fileName)
+                df = pd.DataFrame(columns=['label', 'score'])
+                df['label'] = ppscore[:, 0]
+                df['score'] = ppscore[:, 1]
+
+                threshold = plotAUC(df, user)
+
+                writer.writerow([user, threshold])
+
+            # input("Press enter to continue...")
+
+calculateTresholds()
+
+####################################################################################
+####################################################################################
+####################################################################################
+####################################################################################
+
+
+
 # BINARY CLASSIFIER CREATOR #
 
 
