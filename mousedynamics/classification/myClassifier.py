@@ -14,6 +14,51 @@ from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.ensemble import RandomForestClassifier
 
+
+
+def testForUI(user, session, legality):
+    featureTrainFile = st.classificationDir + st.classOutputFile + user + '.csv';
+    trainDataset = pd.read_csv(featureTrainFile)
+    NUM_TREES = 500
+    numFeaturesTrain = int(trainDataset.shape[1])
+    trainArray = trainDataset.values
+    X_train = trainArray[:, 5: numFeaturesTrain]
+    Y_train = trainArray[:, 0]
+
+    if legality == 1:
+        walkDir = st.legalOpDir
+    else:
+        walkDir = st.illegalOpDir
+
+    featureTestFile = walkDir + user + '\\' + session[2:]
+
+
+    testDataset = pd.read_csv(featureTestFile)
+    numFeaturesTest = int(testDataset.shape[1])
+    testArray = testDataset.values
+    X_validation = testArray[:, 5: numFeaturesTest]
+    Y_validation = []
+
+    XValLength = len(X_validation)
+    if(legality == 1):
+        for i in range(0, XValLength):
+            Y_validation.append(1)
+    else:
+        for i in range(0, XValLength):
+            Y_validation.append(0)
+
+    rf = RandomForestClassifier(n_estimators=NUM_TREES)
+    rf.fit(X_train, Y_train)
+
+    predictions = rf.predict_proba(X_validation)
+    return predictions
+
+##########################################################
+##########################################################
+##########################################################
+##########################################################
+# Test for each sessions file by file
+
 def testSessionForUser(rf, user, featureTestFile, legality):
     # trainDataset = pd.read_csv(featureTrainFile)
     # NUM_TREES = 500
@@ -91,7 +136,7 @@ def loopThroughLegalIllegal(legality):
 
 
 
-loopThroughLegalIllegal(0)
+# loopThroughLegalIllegal(0)
 
 ####################################################################################
 ####################################################################################
@@ -119,9 +164,9 @@ def createBinaryClassifierTestFiles(featureTrainFile, featureTestFile, method):
     userAccuracy = accuracy_score(Y_validation, predictions) #Y_predict
 
     if method == 1:
-        print("LEGAL SCORES")
+        print("SCORES")
     else:
-        print("ILLEGAL SCORES")
+        print("SCORES")
 
     print("Accuracy score")
     print("User " + re.findall('\d+', featureTrainFile)[0], userAccuracy)
