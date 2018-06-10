@@ -1,13 +1,14 @@
 from tkinter import *
+import pandas as pd
 import os
 import mousedynamics.utils.settings as st
 import mousedynamics.classification.myClassifier as test
 import numpy
 # from tkinter import Tk, Listbox, Button, Scrollbar
 
-def getSessions():
+def getSessions(event):
     sessionList.delete(0, END)
-    user = userList.get('active')
+    user = userList.get(userList.curselection()[0])
     fUNumber = re.findall('\d+', user)[0]
 
 
@@ -31,6 +32,7 @@ def predict():
     T.delete('1.0', END)
 
     session = sessionList.get('active')
+
     sessionFileName = session[2:]
     if session[0] == 'L':
         legality = 1
@@ -38,7 +40,20 @@ def predict():
         legality = 0
 
     predictions = test.testForUI(uNum, session, legality)
-    T.insert(END, numpy.mean(predictions[:,1]))
+
+    thDataset = pd.read_csv(st.workDir+st.thresholdFile)
+
+    thresholds = thDataset.values
+
+    for i in thresholds:
+        if i[0] == int(uNum):
+            if numpy.mean(predictions[:,1]) > i[1]:
+                T.insert(END, 'YES')
+            else:
+                T.insert(END, 'NO')
+            break
+
+    return
 
 
 
@@ -55,13 +70,13 @@ def scale():
     sessionScroll.pack(side='right', fill='y')
 
 
-    userList = Listbox(thescale, yscrollcommand = userScroll.set)
-    sessionList = Listbox(thescale, yscrollcommand=sessionScroll.set)
+    userList = Listbox(thescale, yscrollcommand = userScroll.set, exportselection = 0)
+    sessionList = Listbox(thescale, yscrollcommand = sessionScroll.set, exportselection = 0)
 
 
     T = Text(thescale, height=2, width=30)
     T.pack()
-    T.insert(END, "Probability")
+    T.insert(END, "Belongs to user?")
 
     for dirname, dirnames, filenames in os.walk(st.classificationDir):
          for fileName in filenames:
@@ -88,11 +103,15 @@ def scale():
     sessionList.pack(side='right', fill='both')
     sessionScroll.config(command=sessionList.xview)
 
+    userList.bind("<<ListboxSelect>>", getSessions)
+
     userList.pack(side='left', fill='both')
     userScroll.config(command=userList.yview)
 
-    refreshButton=Button(thescale, text="Refresh sessions", command=getSessions)
-    refreshButton.pack()
+    # refreshButton=Button(thescale, text="Refresh sessions", command=getSessions)
+    # refreshButton.pack()
+
+
 
     calculateButton = Button(thescale, text="Calculate predictions", command=predict)
     calculateButton.pack()

@@ -65,6 +65,7 @@ illegalTestSessionCopy = 'D:\\Uni\\Allamvizsga\\Python\\illegal_test_files\\'
 legalOpDir = 'D:\\Uni\\Allamvizsga\\Python\\legalSessionsFeatures\\'
 illegalOpDir = 'D:\\Uni\\Allamvizsga\\Python\\illegalSessionsFeatures\\'
 
+workDir = 'D:\\Uni\\Allamvizsga\\Python\\'
 scoreDir = 'D:\\Uni\\Allamvizsga\\Python\\scoreFiles\\'
 
 ###################

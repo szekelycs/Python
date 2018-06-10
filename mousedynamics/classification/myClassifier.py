@@ -145,7 +145,7 @@ def loopThroughLegalIllegal(legality):
 ####################################################################################
 ####################################################################################
 ####################################################################################
-# TEST TEST TEST #
+# TEST FILES BINARY CLASSIFIER LEGAL AND ILLEGAL TOGETHER #
 
 def createBinaryClassifierTestFiles(featureTrainFile, featureTestFile, method):
     trainDataset = pd.read_csv(featureTrainFile)
@@ -166,10 +166,8 @@ def createBinaryClassifierTestFiles(featureTrainFile, featureTestFile, method):
     predictions = rf.predict(X_validation)
     userAccuracy = accuracy_score(Y_validation, predictions) #Y_predict
 
-    if method == 1:
-        print("SCORES")
-    else:
-        print("SCORES")
+
+    print("SCORES")
 
     print("Accuracy score")
     print("User " + re.findall('\d+', featureTrainFile)[0], userAccuracy)
@@ -203,7 +201,8 @@ def loopThroughUsersTest():
 ####################################################################################
 ####################################################################################
 ####################################################################################
-#  TRAIN TRAIN TRAIN #
+
+#  TRAIN BINARY CLASSIFIER#
 
 
 
@@ -254,7 +253,7 @@ def loopThroughUsersTrainFilesOnly():
 ####################################################################################
 ####################################################################################
 
-
+#TRESHOLD CALCULATION
 
 
 
@@ -339,7 +338,7 @@ def calculateTresholds():
 
             # input("Press enter to continue...")
 
-calculateTresholds()
+# calculateTresholds()
 
 ####################################################################################
 ####################################################################################
