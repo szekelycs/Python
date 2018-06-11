@@ -1,13 +1,20 @@
 import matplotlib.pyplot as plt
 import mousedynamics.utils.settings as st
+import matplotlib.patches as mpatches
 import csv
 
 def plotmouseaction(rowStart, rowFinish, fileName, type):
     with open(fileName) as csvfile:
+
         xCoords = []
         yCoords = []
         reader = csv.reader(csvfile)
         rows = [r for r in reader]
+        mm = mpatches.Patch(color=st.colorMM, label='Mouse Move - MM')
+        rc = mpatches.Patch(color=st.colorRC, label='Right Click - RC')
+        lc = mpatches.Patch(color=st.colorLC, label='Left Click - LC')
+        ld = mpatches.Patch(color=st.colorDD, label='Left Click Drag - LD')
+
         for i in range(rowStart-1, rowFinish):
             print(rows[i])
             xCoords.append(float(rows[i][4]))
@@ -28,16 +35,29 @@ def plotmouseaction(rowStart, rowFinish, fileName, type):
                     if type == 'ld':
                         plt.plot(xCoords, yCoords, linestyle='-', linewidth=0.5, markersize=3, color=st.colorDD, marker='^')
                         plt.axis([0, 2100, 0, 1200])
+        if type == 'mm':
+            plt.legend(handles=[mm])
+        else:
+            if type == 'lc':
+                plt.legend(handles=[lc])
+            else:
+                if type == 'rc':
+                    plt.legend(handles=[rc])
+                else:
+                    if type == 'ld':
+                        plt.legend(handles=[ld])
+                    else:
+                        print('Action type error')
 
         del xCoords[:]
         del yCoords[:]
         plt.show()
 
 
-# plotmouseaction(2, 83, 'session_2144641057.csv', 'mm')
-#plotmouseaction(29679, 29693, 'session_2144641057.csv', 'lc')
-#plotmouseaction(9879, 9890, 'session_2144641057.csv', 'rc')
-# plotmouseaction(119, 125, 'session_2144641057.csv', 'ld')
+plotmouseaction(2, 83, 'session_2144641057.csv', 'mm')
+# plotmouseaction(29679, 29693, 'session_2144641057.csv', 'lc')
+# plotmouseaction(9879, 9890, 'session_2144641057.csv', 'rc')
+# plotmouseaction(955, 977, 'session_2144641057.csv', 'ld')
 
 
 

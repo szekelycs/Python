@@ -23,7 +23,7 @@ def myMMLearnerTestFiles():
 	X_train = array[:,5:]
 	Y_train = array[:,0]
 
-	testdataset = pandas.read_csv('test_mouse_action_summary.csv', skiprows = 1, names = names)
+	testdataset = pandas.read_csv('legal_test_mouse_action_summary.csv', skiprows = 1, names = names)
 
 	X_validation = array[:,5:]
 	Y_validation = array[:,0]

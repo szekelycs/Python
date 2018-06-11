@@ -66,7 +66,7 @@ legalOpDir = 'D:\\Uni\\Allamvizsga\\Python\\legalSessionsFeatures\\'
 illegalOpDir = 'D:\\Uni\\Allamvizsga\\Python\\illegalSessionsFeatures\\'
 
 workDir = 'D:\\Uni\\Allamvizsga\\Python\\'
-scoreDir = 'D:\\Uni\\Allamvizsga\\Python\\scoreFiles\\'
+# scoreDir = 'D:\\Uni\\Allamvizsga\\Python\\scoreFiles\\'
 
 ###################
 # upper limit for xCoord and yCoord

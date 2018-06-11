@@ -65,13 +65,6 @@ def testForUI(user, session, legality):
 # Test for each sessions file by file
 
 def testSessionForUser(rf, user, featureTestFile, legality):
-    # trainDataset = pd.read_csv(featureTrainFile)
-    # NUM_TREES = 500
-    # numFeaturesTrain = int(trainDataset.shape[1])
-    # trainArray = trainDataset.values
-    # X_train = trainArray[:, 5: numFeaturesTrain]
-    # Y_train = trainArray[:, 0]
-
     testDataset = pd.read_csv(featureTestFile)
     numFeaturesTest = int(testDataset.shape[1])
     testArray = testDataset.values
@@ -106,7 +99,7 @@ def testSessionForUser(rf, user, featureTestFile, legality):
     # print("Classification report")
     # print(classification_report(Y_validation, predictions))
 
-    # return userAccuracy
+    return userAccuracy
 # testSessionForUser(st.classificationDir + 'userClassification7.csv', st.legalOpDir + '7\\session_1244242475', 1)
 
 def loopThroughLegalIllegal(legality):
@@ -139,7 +132,7 @@ def loopThroughLegalIllegal(legality):
 
 
 
-# loopThroughLegalIllegal(0)
+# loopThroughLegalIllegal(1)
 
 ####################################################################################
 ####################################################################################
@@ -190,12 +183,14 @@ def loopThroughUsersTest():
             user = re.findall('\d+', fileName)[0]
             # print(user, " ", fileName)
             score1 = createBinaryClassifierTestFiles(st.classificationDir + fileName, st.classificationLegalTestDir + st.classOutputLegalTestFile + user + '.csv', 1)
-            score2 = createBinaryClassifierTestFiles(st.classificationDir + fileName, st.classificationIllegalTestDir + st.classOutputIllegalTestFile + user + '.csv', 0)
+            # score2 = createBinaryClassifierTestFiles(st.classificationDir + fileName, st.classificationIllegalTestDir + st.classOutputIllegalTestFile + user + '.csv', 0)
             accuracy.append(score1)
-            accuracy.append(score2)
+            # accuracy.append(score2)
             # input("Press Enter to continue...")
             # print(user, " legal: ", score1, " illegal: ", score2)
 
+
+# loopThroughUsersTest()
 
 ####################################################################################
 ####################################################################################
@@ -268,21 +263,20 @@ def plotAUC(data_no, user ):
     print("System EER:",eer_no)
     #meghatározza az eer_no értékhez tartozó küszöbértéket
     thresh_no = interp1d(fpr_no, thresholds_no)(eer_no)
-    print(thresh_no)
+    # print(thresh_no)
 
+    plt.figure()
+    lw = 2
+    plt.plot(fpr_no, tpr_no, color='black', lw=lw, label='AUC = %0.4f' % auc_value_no)
+    plt.plot([0, 1], [0, 1], color='darkorange', lw=lw, linestyle='--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('AUC')
+    plt.legend(loc="lower right")
+    plt.show()
 
-
-    # plt.figure()
-    # lw = 2
-    # plt.plot(fpr_no,     tpr_no,     color='black', lw=lw, label='AUC = %0.4f' % auc_value_no)
-    # plt.plot([0, 1], [0, 1], color='darkorange', lw=lw, linestyle='--')
-    # plt.xlim([0.0, 1.0])
-    # plt.ylim([0.0, 1.05])
-    # plt.xlabel('False Positive Rate')
-    # plt.ylabel('True Positive Rate')
-    # plt.title('AUC')
-    # plt.legend(loc="lower right")
-    # plt.show(block = False)
     return thresh_no
 
 
@@ -331,7 +325,6 @@ def calculateTresholds():
                 df = pd.DataFrame(columns=['label', 'score'])
                 df['label'] = ppscore[:, 0]
                 df['score'] = ppscore[:, 1]
-
                 threshold = plotAUC(df, user)
 
                 writer.writerow([user, threshold])
