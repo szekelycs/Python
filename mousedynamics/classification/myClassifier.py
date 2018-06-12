@@ -154,7 +154,7 @@ def loopThroughLegalIllegal(legality):
 ####################################################################################
 # TEST FILES BINARY CLASSIFIER LEGAL AND ILLEGAL TOGETHER #
 
-def createBinaryClassifierTestFiles(featureTrainFile, featureTestFile, method):
+def createBinaryClassifierTestFiles(featureTrainFile, featureTestFile):
     trainDataset = pd.read_csv(featureTrainFile)
     NUM_TREES = 500
     numFeaturesTrain = int(trainDataset.shape[1])
@@ -165,6 +165,9 @@ def createBinaryClassifierTestFiles(featureTrainFile, featureTestFile, method):
     testDataset = pd.read_csv(featureTestFile)
     numFeaturesTest = int(testDataset.shape[1])
     testArray = testDataset.values
+
+    testArray = numpy.nan_to_num(testArray)
+
     X_validation = testArray[:, 5: numFeaturesTest]
     Y_validation = testArray[:, 0]
 
@@ -196,7 +199,7 @@ def loopThroughUsersTest():
         for fileName in filenames:
             user = re.findall('\d+', fileName)[0]
             # print(user, " ", fileName)
-            score1 = createBinaryClassifierTestFiles(st.classificationDir + fileName, st.classificationLegalTestDir + st.classOutputLegalTestFile + user + '.csv', 1)
+            score1 = createBinaryClassifierTestFiles(st.classificationDir + fileName, st.classificationTestDir + st.classOutputTestFile + user + '.csv')
             # score2 = createBinaryClassifierTestFiles(st.classificationDir + fileName, st.classificationIllegalTestDir + st.classOutputIllegalTestFile + user + '.csv', 0)
             accuracy.append(score1)
             # accuracy.append(score2)
@@ -292,8 +295,8 @@ def plotAUC(data_no, user, color ):
 
     fpr_no, tpr_no, thresholds_no = metrics.roc_curve(labels_no, scores_no, pos_label=1)
     eer_no = brentq(lambda x: 1. - x - interp1d(fpr_no, tpr_no)(x), 0., 1.)
-    print("System AUC", auc_value_no)
-    print("System EER:",eer_no)
+    # print("System AUC", auc_value_no)
+    # print("System EER:",eer_no)
     #meghatározza az eer_no értékhez tartozó küszöbértéket
     thresh_no = interp1d(fpr_no, thresholds_no)(eer_no)
     # print(thresh_no)
@@ -311,8 +314,8 @@ def plotAUC(data_no, user, color ):
     plt.title('AUC')
     plt.legend(loc="lower right")
 
-
-    return thresh_no
+    return auc_value_no
+    # return thresh_no
 
 
 def tresholdUtil(featureFileName):
@@ -345,7 +348,7 @@ def tresholdUtil(featureFileName):
 
 
 def testAUCutil(featureFileName, featureTestFile):
-    print(featureFileName, featureTestFile)
+    # print(featureFileName, featureTestFile)
 
     dataset = pd.read_csv(st.classificationDir + featureFileName)
     NUM_TREES = 500
@@ -357,6 +360,7 @@ def testAUCutil(featureFileName, featureTestFile):
     testDataset = pd.read_csv(featureTestFile)
     numFeaturesTest = int(testDataset.shape[1])
     testArray = testDataset.values
+    testArray = numpy.nan_to_num(testArray)
     X_validation = testArray[:, 5: numFeaturesTest]
     Y_validation = testArray[:, 0]
 
@@ -388,27 +392,30 @@ def calculateThresholds():
         for i in range(0, 10):
             colors.append(generate_new_color(colors))
 
-        print(colors)
+        testAUCScores = []
+        trainAUCScores = []
 
         for dirname, dirnames, filenames in os.walk(st.classificationDir):
             for fileName in filenames:
                 user = os.path.basename(fileName)
                 user = re.findall('\d+', fileName)[0]
-                print(user, " ", fileName)
-                # score = createBinaryClassifier(fileName)
-                # accuracy.append(score)
-                # ppscore = tresholdUtil(fileName)
+                # print(user, " ", fileName)
 
-                ppscore = testAUCutil(fileName, st.classificationLegalTestDir + st.classOutputLegalTestFile + user + '.csv')
+                ppscore = testAUCutil(fileName, st.classificationTestDir + st.classOutputTestFile + user + '.csv')
+
+                # print(numpy.mean(ppscore[:,1]))
                 df = pd.DataFrame(columns=['label', 'score'])
                 df['label'] = ppscore[:, 0]
                 df['score'] = ppscore[:, 1]
 
 
-                threshold = plotAUC(df, user, colors[k])
+                auc_test = plotAUC(df, user, colors[k])
+                testAUCScores.append(auc_test)
                 k = k + 1
 
-                writer.writerow([user, threshold])
+                # writer.writerow([user, threshold])
+
+        print("TEST MEAN = " + str(numpy.mean(testAUCScores)))
         plt.show()
         plt.figure()
         k = 0
@@ -416,7 +423,7 @@ def calculateThresholds():
             for fileName in filenames:
                 user = os.path.basename(fileName)
                 user = re.findall('\d+', fileName)[0]
-                print(user, " ", fileName)
+                # print(user, " ", fileName)
 
                 ppscore = tresholdUtil(fileName)
 
@@ -424,14 +431,14 @@ def calculateThresholds():
                 df['label'] = ppscore[:, 0]
                 df['score'] = ppscore[:, 1]
 
-                threshold = plotAUC(df, user, colors[k])
+                auc_train = plotAUC(df, user, colors[k])
+                trainAUCScores.append(auc_train)
                 k = k + 1
-
-                writer.writerow([user, threshold])
+        print("TRAIN MEAN = " + str(numpy.mean(trainAUCScores)))
         plt.show()
             # input("Press enter to continue...")
 
-# calculateThresholds()
+calculateThresholds()
 
 ####################################################################################
 ####################################################################################
@@ -443,29 +450,11 @@ def calculateThresholds():
 # BINARY CLASSIFIER CREATOR #
 
 
-def classify(method):
-    if method == 1:
-        ipfi = st.outputFile
-        opd = st.classificationDir
-        opf = st.classOutputFile
-    else:
-        if method == 0:
-            ipfi = st.outputTestFile
-            opd = st.classificationTestDir
-            opf = st.classOutputTestFile
-        else:
-            if method == 2:
-                ipfi = st.outputLegalTestFile
-                opd = st.classificationLegalTestDir
-                opf = st.classOutputLegalTestFile
-            else:
-                if method == 3:
-                    ipfi = st.outputIllegalTestFile
-                    opd = st.classificationIllegalTestDir
-                    opf = st.classOutputIllegalTestFile
-                else:
-                    print('Method error')
-                    return
+def classify():
+    ipfi = st.outputFile
+    opd = st.classificationDir
+    opf = st.classOutputFile
+
 
 
     result = numpy.array(list(csv.reader(open(ipfi))))
@@ -584,7 +573,62 @@ def classify(method):
                 k = k + 1
         i = i + 1
 
-####################################################################################
+def classifyTestFiles():
+    ipfi = st.outputTestFile
+    opd = st.classificationTestDir
+
+    if not os.path.exists(opd):
+        os.makedirs(opd)
+
+    df = pd.read_csv(ipfi, sep=',')
+
+    userG = df.groupby(st.csvOutHeaders[0]).agg(lambda x: ','.join(x))
+
+    for uName in userG.index:
+        with open(opd + st.classOutputTestFile + str(uName) + '.csv', 'w+', newline='') as userOpf:
+
+            writer = csv.writer(userOpf, delimiter=',')
+            writer.writerow(st.csvOutHeaders)
+
+            for dirname, dirnames, filenames in os.walk(st.legalOpDir):
+                for dirN in dirnames:
+                    if int(dirN) == uName:
+                        for dN, dNs, fNs in os.walk(st.legalOpDir + str(uName)):
+                            for fN in fNs:
+                                firstRow = True
+                                with open(st.legalOpDir + str(uName) + '\\'+ fN) as sessionInFile:
+                                    reader = csv.reader(sessionInFile)
+                                    for row in reader:
+                                        if firstRow:
+                                            firstRow = False
+                                            continue
+                                        rowToAppend = []
+                                        rowToAppend.append('1')
+                                        rowToAppend.extend(row[1:-1])
+                                        writer.writerow(rowToAppend)
+
+            for dirname, dirnames, filenames in os.walk(st.illegalOpDir):
+                for dirN in dirnames:
+                    if int(dirN )== uName:
+                        for dN, dNs, fNs in os.walk(st.illegalOpDir + str(uName)):
+                            for fN in fNs:
+                                firstRow = True;
+                                with open(st.illegalOpDir + str(uName) + '\\' + fN) as sessionInFile:
+                                    reader = csv.reader(sessionInFile)
+                                    for row in reader:
+                                        if firstRow:
+                                            firstRow = False
+                                            continue
+                                        rowToAppend = []
+                                        rowToAppend.append('0')
+                                        rowToAppend.extend(row[1:-1])
+                                        writer.writerow(rowToAppend)
+
+# classifyTestFiles()
+
+
+
+            ####################################################################################
 ####################################################################################
 ####################################################################################
 ####################################################################################
@@ -595,6 +639,7 @@ def classify(method):
 # classify(2)
 # classify(3)
 # classify(1)
+# classify(0)
 # # 1 - train, 0 - test
 # print('TRAIN')
 # loopThroughUsersTrainFilesOnly()
