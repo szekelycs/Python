@@ -1,4 +1,5 @@
 from mousedynamics.utils import settings as st
+import random
 import csv
 import numpy
 import os
@@ -6,6 +7,7 @@ import pandas as pd
 import re
 from random import randint
 import matplotlib.pyplot as plt
+import pickle
 
 from scipy.interpolate import interp1d
 from scipy.optimize import brentq
@@ -20,23 +22,38 @@ from sklearn.ensemble import RandomForestClassifier
 import sklearn.metrics as metrics
 
 
+def trainAllUsers():
+    if not os.path.exists(st.modelDir):
+        os.makedirs(st.modelDir)
+
+    for dirname, dirnames, filenames in os.walk(st.classificationDir):
+        for fN in filenames:
+            user = re.findall('\d+', fN)[0]
+            trainDataset = pd.read_csv(st.classificationDir + fN)
+            NUM_TREES = 500
+            numFeaturesTrain = int(trainDataset.shape[1])
+            trainArray = trainDataset.values
+            X_train = trainArray[:, 5: numFeaturesTrain]
+            Y_train = trainArray[:, 0]
+
+
+            rf = RandomForestClassifier(n_estimators=NUM_TREES)
+            rf.fit(X_train, Y_train)
+            pickle.dump(rf, open(st.modelDir + user, 'wb'))
+
+
+# trainAllUsers()
+
+
 
 def testForUI(user, session, legality):
-    featureTrainFile = st.classificationDir + st.classOutputFile + user + '.csv';
-    trainDataset = pd.read_csv(featureTrainFile)
-    NUM_TREES = 500
-    numFeaturesTrain = int(trainDataset.shape[1])
-    trainArray = trainDataset.values
-    X_train = trainArray[:, 5: numFeaturesTrain]
-    Y_train = trainArray[:, 0]
-
+    rf = pickle.load(open(st.modelDir + user, 'rb'))
     if legality == 1:
         walkDir = st.legalOpDir
     else:
         walkDir = st.illegalOpDir
 
     featureTestFile = walkDir + user + '\\' + session[2:]
-
 
     testDataset = pd.read_csv(featureTestFile)
     numFeaturesTest = int(testDataset.shape[1])
@@ -51,9 +68,6 @@ def testForUI(user, session, legality):
     else:
         for i in range(0, XValLength):
             Y_validation.append(0)
-
-    rf = RandomForestClassifier(n_estimators=NUM_TREES)
-    rf.fit(X_train, Y_train)
 
     predictions = rf.predict_proba(X_validation)
     return predictions
@@ -251,8 +265,27 @@ def loopThroughUsersTrainFilesOnly():
 #TRESHOLD CALCULATION
 
 
+def get_random_color(pastel_factor = 0.5):
+    return [(x+pastel_factor)/(1.0+pastel_factor) for x in [random.uniform(0,1.0) for i in [1,2,3]]]
 
-def plotAUC(data_no, user ):
+def color_distance(c1,c2):
+    return sum([abs(x[0]-x[1]) for x in zip(c1,c2)])
+
+def generate_new_color(existing_colors,pastel_factor = 0.5):
+    max_distance = None
+    best_color = None
+    for i in range(0,100):
+        color = get_random_color(pastel_factor = pastel_factor)
+        if not existing_colors:
+            return color
+        best_distance = min([color_distance(color,c) for c in existing_colors])
+        if not max_distance or best_distance > max_distance:
+            max_distance = best_distance
+            best_color = color
+    return best_color
+
+
+def plotAUC(data_no, user, color ):
     labels_no = data_no['label']
     scores_no = data_no['score']
     auc_value_no =   metrics.roc_auc_score(numpy.array(labels_no), numpy.array(scores_no) )
@@ -265,9 +298,11 @@ def plotAUC(data_no, user ):
     thresh_no = interp1d(fpr_no, thresholds_no)(eer_no)
     # print(thresh_no)
 
-    plt.figure()
+
     lw = 2
-    plt.plot(fpr_no, tpr_no, color='black', lw=lw, label='AUC = %0.4f' % auc_value_no)
+    # plt.plot(fpr_no, tpr_no, color='black', lw=lw, label='AUC = %0.4f' % auc_value_no)
+    plt.plot(fpr_no, tpr_no, color=color, lw=lw, label='user' + user + ' = %0.4f' % auc_value_no)
+
     plt.plot([0, 1], [0, 1], color='darkorange', lw=lw, linestyle='--')
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
@@ -275,7 +310,7 @@ def plotAUC(data_no, user ):
     plt.ylabel('True Positive Rate')
     plt.title('AUC')
     plt.legend(loc="lower right")
-    plt.show()
+
 
     return thresh_no
 
@@ -309,11 +344,52 @@ def tresholdUtil(featureFileName):
     return scoreArray
 
 
+def testAUCutil(featureFileName, featureTestFile):
+    print(featureFileName, featureTestFile)
 
-def calculateTresholds():
+    dataset = pd.read_csv(st.classificationDir + featureFileName)
+    NUM_TREES = 500
+    numFeatures = int(dataset.shape[1])
+    array = dataset.values
+    X_train = array[:, 5 : numFeatures]
+    Y_train = array[:, 0]
+
+    testDataset = pd.read_csv(featureTestFile)
+    numFeaturesTest = int(testDataset.shape[1])
+    testArray = testDataset.values
+    X_validation = testArray[:, 5: numFeaturesTest]
+    Y_validation = testArray[:, 0]
+
+
+    yValShape = Y_validation.shape[0]
+    scoreArray = numpy.zeros((yValShape, 2))
+
+    rf = RandomForestClassifier(n_estimators=NUM_TREES)
+    rf.fit(X_train, Y_train)
+
+    scores = rf.predict_proba(X_validation)
+
+    for i, j, k in zip(Y_validation, scores, range(0, yValShape)):
+        scoreArray[k][0] = i
+        scoreArray[k][1] = j[1]
+
+    return scoreArray
+
+
+
+def calculateThresholds():
     accuracy = []
     with open(st.thresholdFile, "w+", newline='') as opCsv:
         writer = csv.writer(opCsv, delimiter=',')
+        plt.figure()
+
+        colors = []
+        k = 0
+        for i in range(0, 10):
+            colors.append(generate_new_color(colors))
+
+        print(colors)
+
         for dirname, dirnames, filenames in os.walk(st.classificationDir):
             for fileName in filenames:
                 user = os.path.basename(fileName)
@@ -321,17 +397,41 @@ def calculateTresholds():
                 print(user, " ", fileName)
                 # score = createBinaryClassifier(fileName)
                 # accuracy.append(score)
-                ppscore = tresholdUtil(fileName)
+                # ppscore = tresholdUtil(fileName)
+
+                ppscore = testAUCutil(fileName, st.classificationLegalTestDir + st.classOutputLegalTestFile + user + '.csv')
                 df = pd.DataFrame(columns=['label', 'score'])
                 df['label'] = ppscore[:, 0]
                 df['score'] = ppscore[:, 1]
-                threshold = plotAUC(df, user)
+
+
+                threshold = plotAUC(df, user, colors[k])
+                k = k + 1
 
                 writer.writerow([user, threshold])
+        plt.show()
+        plt.figure()
+        k = 0
+        for dirname, dirnames, filenames in os.walk(st.classificationDir):
+            for fileName in filenames:
+                user = os.path.basename(fileName)
+                user = re.findall('\d+', fileName)[0]
+                print(user, " ", fileName)
 
+                ppscore = tresholdUtil(fileName)
+
+                df = pd.DataFrame(columns=['label', 'score'])
+                df['label'] = ppscore[:, 0]
+                df['score'] = ppscore[:, 1]
+
+                threshold = plotAUC(df, user, colors[k])
+                k = k + 1
+
+                writer.writerow([user, threshold])
+        plt.show()
             # input("Press enter to continue...")
 
-# calculateTresholds()
+# calculateThresholds()
 
 ####################################################################################
 ####################################################################################

@@ -13,6 +13,8 @@ classOutputIllegalTestFile = 'userClassificationIllegalTest'
 thresholdFile = 'thresholds.csv'
 scoreFile = 'userScores.csv'
 
+userCount = 10
+
 #parameters for mouse move plots
 leftClickOnly = 1
 rightClickOnly = 1
@@ -64,8 +66,10 @@ illegalTestSessionCopy = 'D:\\Uni\\Allamvizsga\\Python\\illegal_test_files\\'
 
 legalOpDir = 'D:\\Uni\\Allamvizsga\\Python\\legalSessionsFeatures\\'
 illegalOpDir = 'D:\\Uni\\Allamvizsga\\Python\\illegalSessionsFeatures\\'
+modelDir = 'D:\\Uni\\Allamvizsga\\Python\\RFModels\\'
 
 workDir = 'D:\\Uni\\Allamvizsga\\Python\\'
+
 # scoreDir = 'D:\\Uni\\Allamvizsga\\Python\\scoreFiles\\'
 
 ###################

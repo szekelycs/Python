@@ -4,6 +4,7 @@ import os
 import mousedynamics.utils.settings as st
 import mousedynamics.classification.myClassifier as test
 import numpy
+import pickle
 # from tkinter import Tk, Listbox, Button, Scrollbar
 
 def getSessions(event):
@@ -38,6 +39,8 @@ def predict():
         legality = 1
     else:
         legality = 0
+
+
 
     predictions = test.testForUI(uNum, session, legality)
 
