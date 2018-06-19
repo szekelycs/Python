@@ -17,16 +17,17 @@ from sklearn.naive_bayes import GaussianNB
 def myMMLearnerTestFiles():
 
 	names = st.csvOutHeaders
-	dataset = pandas.read_csv('mouse_action_summary.csv', skiprows = 1, names = names)
+	dataset = pandas.read_csv(st.workDir + 'mouse_action_summary.csv', skiprows = 1, names = names)
 	array = dataset.values
 
 	X_train = array[:,5:]
 	Y_train = array[:,0]
 
-	testdataset = pandas.read_csv('legal_test_mouse_action_summary.csv', skiprows = 1, names = names)
+	testdataset = pandas.read_csv(st.workDir + 'test_mouse_action_summary.csv', skiprows = 1, names = names)
+	testarray = testdataset.values
 
-	X_validation = array[:,5:]
-	Y_validation = array[:,0]
+	X_validation = testarray[:,5:]
+	Y_validation = testarray[:,0]
 
 
 	# validation_size = 0.10

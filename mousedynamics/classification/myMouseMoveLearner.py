@@ -17,7 +17,7 @@ def myMouseMoveLearner():
 
 	names = st.csvOutHeaders
 
-	dataset = pandas.read_csv(st.outputFile, skiprows = 1, names = names)
+	dataset = pandas.read_csv(st.workDir + st.outputFile, skiprows = 1, names = names)
 	array = dataset.values
 
 	X = array[:,5:]
