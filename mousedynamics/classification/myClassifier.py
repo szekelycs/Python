@@ -258,7 +258,10 @@ def loopThroughUsersTrainFilesOnly():
             score = createBinaryClassifier(fileName)
             accuracy.append(score)
 
-            input("Press enter to continue...")
+            # input("Press enter to continue...")
+
+
+# loopThroughUsersTrainFilesOnly()
 
 ####################################################################################
 ####################################################################################
@@ -288,7 +291,7 @@ def generate_new_color(existing_colors,pastel_factor = 0.5):
     return best_color
 
 
-def plotAUC(data_no, user, color ):
+def plotAUC(data_no, user, color, method ):
     labels_no = data_no['label']
     scores_no = data_no['score']
     auc_value_no =   metrics.roc_auc_score(numpy.array(labels_no), numpy.array(scores_no) )
@@ -304,7 +307,7 @@ def plotAUC(data_no, user, color ):
 
     lw = 2
     # plt.plot(fpr_no, tpr_no, color='black', lw=lw, label='AUC = %0.4f' % auc_value_no)
-    plt.plot(fpr_no, tpr_no, color=color, lw=lw, label='user' + user + ' = %0.4f' % auc_value_no)
+    plt.plot(fpr_no, tpr_no, color=color, lw=lw, label='user' + user + ' ' + method + ' = %0.4f' % auc_value_no)
 
     plt.plot([0, 1], [0, 1], color='darkorange', lw=lw, linestyle='--')
     plt.xlim([0.0, 1.0])
@@ -314,8 +317,8 @@ def plotAUC(data_no, user, color ):
     plt.title('AUC')
     plt.legend(loc="lower right")
 
-    return auc_value_no
-    # return thresh_no
+    # return auc_value_no
+    return thresh_no
 
 
 def tresholdUtil(featureFileName):
@@ -381,6 +384,9 @@ def testAUCutil(featureFileName, featureTestFile):
 
 
 
+
+
+
 def calculateThresholds():
     accuracy = []
     with open(st.thresholdFile, "w+", newline='') as opCsv:
@@ -392,8 +398,8 @@ def calculateThresholds():
         for i in range(0, 10):
             colors.append(generate_new_color(colors))
 
-        testAUCScores = []
-        trainAUCScores = []
+        # testAUCScores = []
+        # trainAUCScores = []
 
         for dirname, dirnames, filenames in os.walk(st.classificationDir):
             for fileName in filenames:
@@ -409,36 +415,81 @@ def calculateThresholds():
                 df['score'] = ppscore[:, 1]
 
 
-                auc_test = plotAUC(df, user, colors[k])
-                testAUCScores.append(auc_test)
+                threshold = plotAUC(df, user, colors[k], 'test')
+                # testAUCScores.append(auc_test)
                 k = k + 1
 
-                # writer.writerow([user, threshold])
-
-        print("TEST MEAN = " + str(numpy.mean(testAUCScores)))
         plt.show()
         plt.figure()
+        # print("TEST MEAN = " + str(numpy.mean(testAUCScores)))
+
+
         k = 0
         for dirname, dirnames, filenames in os.walk(st.classificationDir):
             for fileName in filenames:
                 user = os.path.basename(fileName)
                 user = re.findall('\d+', fileName)[0]
                 # print(user, " ", fileName)
-
                 ppscore = tresholdUtil(fileName)
 
                 df = pd.DataFrame(columns=['label', 'score'])
                 df['label'] = ppscore[:, 0]
                 df['score'] = ppscore[:, 1]
 
-                auc_train = plotAUC(df, user, colors[k])
-                trainAUCScores.append(auc_train)
+                threshold = plotAUC(df, user, colors[k], 'train')
+
+                writer.writerow([user, threshold])
+
+                # trainAUCScores.append(auc_train)
                 k = k + 1
-        print("TRAIN MEAN = " + str(numpy.mean(trainAUCScores)))
+        # print("TRAIN MEAN = " + str(numpy.mean(trainAUCScores)))
         plt.show()
             # input("Press enter to continue...")
 
-calculateThresholds()
+# calculateThresholds()
+
+def plotAUCtestTrain():
+    accuracy = []
+    with open(st.thresholdFile, "w+", newline='') as opCsv:
+        writer = csv.writer(opCsv, delimiter=',')
+        # plt.figure()
+
+        colors = []
+        k = 0
+        for i in range(0, 20):
+            colors.append(generate_new_color(colors))
+
+        # testAUCScores = []
+        # trainAUCScores = []
+
+        for dirname, dirnames, filenames in os.walk(st.classificationDir):
+            for fileName in filenames:
+                user = os.path.basename(fileName)
+                user = re.findall('\d+', fileName)[0]
+                plt.figure()
+                # print(user, " ", fileName)
+
+                ppscoretest = testAUCutil(fileName, st.classificationTestDir + st.classOutputTestFile + user + '.csv')
+
+                # print(numpy.mean(ppscore[:,1]))
+                dftest = pd.DataFrame(columns=['label', 'score'])
+                dftest['label'] = ppscoretest[:, 0]
+                dftest['score'] = ppscoretest[:, 1]
+
+                threshold = plotAUC(dftest, user, colors[k], 'test')
+
+                ppscoretrain = tresholdUtil(fileName)
+
+                dftrain = pd.DataFrame(columns=['label', 'score'])
+                dftrain['label'] = ppscoretrain[:, 0]
+                dftrain['score'] = ppscoretrain[:, 1]
+
+                threshold = plotAUC(dftrain, user, colors[k+10], 'train')
+                plt.show()
+
+                k = k + 1
+
+# plotAUCtestTrain()
 
 ####################################################################################
 ####################################################################################

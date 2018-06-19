@@ -68,6 +68,12 @@ legalOpDir = 'D:\\Uni\\Allamvizsga\\Python\\legalSessionsFeatures\\'
 illegalOpDir = 'D:\\Uni\\Allamvizsga\\Python\\illegalSessionsFeatures\\'
 modelDir = 'D:\\Uni\\Allamvizsga\\Python\\RFModels\\'
 
+testPlotsDir = 'D:\\Uni\\Allamvizsga\\Python\\TestPlots\\'
+
+positive = 'D:\\Uni\\Allamvizsga\\Python\\results\\positive.png'
+negative = 'D:\\Uni\\Allamvizsga\\Python\\results\\negative.png'
+empty = 'D:\\Uni\\Allamvizsga\\Python\\results\\empty.png'
+
 workDir = 'D:\\Uni\\Allamvizsga\\Python\\'
 
 # scoreDir = 'D:\\Uni\\Allamvizsga\\Python\\scoreFiles\\'

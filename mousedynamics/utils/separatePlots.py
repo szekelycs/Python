@@ -1,4 +1,5 @@
 import csv
+import os
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from mousedynamics.utils import settings as st
@@ -9,9 +10,14 @@ from mousedynamics.utils import settings as st
 ######################
 ######################
 
-def plotSession(fileName, user):
+def plotSession(fopenPath, fileName, user):
 
-    with open(fileName) as csvfile:
+    if not os.path.exists(st.testPlotsDir):
+        os.makedirs(st.testPlotsDir)
+
+
+
+    with open(fopenPath) as csvfile:
         reader = csv.reader(csvfile)
 
         rowCnt = 0;                             # starts counting at the beginning of mouse action
@@ -31,7 +37,7 @@ def plotSession(fileName, user):
         lc = mpatches.Patch(color=st.colorLC, label='Left Click - LC')
         ld = mpatches.Patch(color=st.colorDD, label='Left Click Drag - LD')
         # rd = mpatches.Patch(color='magenta', label='Right Click Drag - RD')
-
+        plt.figure()
         plt.legend(handles=[mm, rc, lc, ld])
         plotTitle =  user + ' - ' + fileName
         plt.title(plotTitle, fontsize = 16)
@@ -176,20 +182,26 @@ def plotSession(fileName, user):
                                         else:
                                             print("No Press or Drag before Release?, rowCnt: ", rowCnt, " ; n-from: ", tmpStartLine, " ; n-to", allRows)
         print("All: ", allRows)
-        plt.show()
+        # plt.show()
+        plt.savefig(st.testPlotsDir + fileName + '.png')
         return
 
-plotSession('session_0172860263', 'User 12 - test')
-plotSession('session_5815391283', 'User 12 - train')
+
+def plotAllTestFiles():
+    for dirname, dirnames, filenames in os.walk(st.legalTestSessionCopy):
+        for userDirx in dirnames:
+            for userDir, subDirs, sessionfiles in os.walk(st.legalTestSessionCopy + userDirx):
+                for sessionFile in sessionfiles:
+                    plotSession(userDir + '\\' + sessionFile, sessionFile, 'User ' + userDirx + ' - test')
+
+    for dirname, dirnames, filenames in os.walk(st.illegalTestSessionCopy):
+        for userDirx in dirnames:
+            for userDir, subDirs, sessionfiles in os.walk(st.illegalTestSessionCopy + userDirx):
+                for sessionFile in sessionfiles:
+                    plotSession(userDir + '\\' + sessionFile, sessionFile, 'User ' + userDirx + ' - test')
 
 
-#import pandas as pd
-#actiondata = pd.read_csv(st.ACTION_FILENAME)
-#actiontype = actiondata['type_of_action']
 
-#dataset = pd.read_csv(feature_filename)
-# ends with class,session,n_from,n_to
-#numFeatures = int(dataset.shape[1]) - 3  ---- shape[0] sorok szama, shape[1] oszlopok szama
-#classes = dataset.groupby('class')
 
-#ket egymast koveto sor teljesen megegyezik - kiszurni
+
+plotAllTestFiles()

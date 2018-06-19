@@ -1,4 +1,5 @@
 from tkinter import *
+from PIL import ImageTk, Image
 import pandas as pd
 import os
 import mousedynamics.utils.settings as st
@@ -11,7 +12,6 @@ def getSessions(event):
     sessionList.delete(0, END)
     user = userList.get(userList.curselection()[0])
     fUNumber = re.findall('\d+', user)[0]
-
 
     for dirname, dirnames, filenames in os.walk(st.legalOpDir):
         for dir in dirnames:
@@ -27,10 +27,18 @@ def getSessions(event):
                     for file in filenames2:
                         sessionList.insert(END, "I " + file)
 
+def getSessionPlot(event):
+    session = sessionList.get(sessionList.curselection()[0])
+    tmp = Image.open(st.testPlotsDir + session[2:] + '.png')
+    img = tmp.resize((400, 300), Image.ANTIALIAS)
+    phImg = ImageTk.PhotoImage(img)
+    panel.configure(image=phImg)
+    panel.image = phImg
+
 def predict():
     user = userList.get('active')
     uNum = re.findall('\d+', user)[0]
-    T.delete('1.0', END)
+
 
     session = sessionList.get('active')
 
@@ -51,9 +59,17 @@ def predict():
     for i in thresholds:
         if i[0] == int(uNum):
             if numpy.mean(predictions[:,1]) > i[1]:
-                T.insert(END, 'YES')
+                tmp = Image.open(st.positive)
+                bgImg = tmp.resize((150, 50), Image.ANTIALIAS)
+                phIm = ImageTk.PhotoImage(bgImg)
+                belongImg.configure(image=phIm)
+                belongImg.image = phIm
             else:
-                T.insert(END, 'NO')
+                tmp = Image.open(st.negative)
+                bgImg = tmp.resize((150, 50), Image.ANTIALIAS)
+                phIm = ImageTk.PhotoImage(bgImg)
+                belongImg.configure(image=phIm)
+                belongImg.image = phIm
             break
 
     return
@@ -63,23 +79,31 @@ def predict():
 def scale():
     global userList
     global sessionList
-    global T
+
+    global bgImg
+    global phIm
+    global belongImg
+
+
+    global img
+    global phImg
+    global panel
+    global thescale
 
     thescale=Tk()
     userScroll=Scrollbar(thescale)
     userScroll.pack(side='left', fill='y')
 
     sessionScroll = Scrollbar(thescale)
-    sessionScroll.pack(side='right', fill='y')
+    sessionScroll.pack(side='left', fill='y')
 
 
     userList = Listbox(thescale, yscrollcommand = userScroll.set, exportselection = 0)
     sessionList = Listbox(thescale, yscrollcommand = sessionScroll.set, exportselection = 0)
 
-
-    T = Text(thescale, height=2, width=30)
-    T.pack()
-    T.insert(END, "Belongs to user?")
+    # T = Text(thescale, height=2, width=30)
+    # T.pack(side='bottom')
+    # T.insert(END, "Belongs to user?")
 
     for dirname, dirnames, filenames in os.walk(st.classificationDir):
          for fileName in filenames:
@@ -103,21 +127,40 @@ def scale():
                     for file in filenames2:
                         sessionList.insert(END, "I " + file)
 
-    sessionList.pack(side='right', fill='both')
-    sessionScroll.config(command=sessionList.xview)
+
+
+    tmp2 = Image.open(st.empty)
+    bgImg = tmp2.resize((150, 50), Image.ANTIALIAS)
+    phIm = ImageTk.PhotoImage(bgImg)
+    belongImg = Label(thescale, image=phIm)
+    belongImg.pack()
+
+    calculateButton = Button(thescale, text="Calculate predictions", command=predict)
+    calculateButton.pack(side='bottom', fill = X)
+
+    tmp = Image.open(st.testPlotsDir + sessionList.get('active')[2:] + '.png')
+    img = tmp.resize((400, 300), Image.ANTIALIAS)
+    phImg = ImageTk.PhotoImage(img)
+    panel = Label(thescale, image=phImg)
+    panel.pack(side="right", fill="both", expand="no")
+
+
 
     userList.bind("<<ListboxSelect>>", getSessions)
+    sessionList.bind("<<ListboxSelect>>", getSessionPlot)
 
     userList.pack(side='left', fill='both')
     userScroll.config(command=userList.yview)
+
+    sessionList.pack(side='left', fill='both')
+    sessionScroll.config(command=sessionList.xview)
 
     # refreshButton=Button(thescale, text="Refresh sessions", command=getSessions)
     # refreshButton.pack()
 
 
 
-    calculateButton = Button(thescale, text="Calculate predictions", command=predict)
-    calculateButton.pack()
+
 
 
     thescale.mainloop()
