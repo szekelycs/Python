@@ -155,14 +155,6 @@ def scale():
     sessionList.pack(side='left', fill='both')
     sessionScroll.config(command=sessionList.xview)
 
-    # refreshButton=Button(thescale, text="Refresh sessions", command=getSessions)
-    # refreshButton.pack()
-
-
-
-
-
-
     thescale.mainloop()
 
 scale()

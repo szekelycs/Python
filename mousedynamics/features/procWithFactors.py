@@ -7,62 +7,17 @@ import pandas as pd
 from shutil import copyfile
 
 
-
-
-def createTestCsvEachSession():
-    ipDir = st.testDir
-    legalOpDir = st.legalOpDir
-    illegalOpDir = st.illegalOpDir
-    dataset = pd.read_csv(st.publicLabels)
-    fileNames = dataset.values
-
-    method = st.testMethod
-
-    legalSessions = []
-    illegalSessions = []
-
-    for i in fileNames:
-        if i[1] == 0:
-            legalSessions.append(i[0])
-        else:
-            if i[1] == 1:
-                illegalSessions.append(i[0])
-            else:
-                print(i[0], ' file legality error.')
-                continue;
-
-    if not os.path.exists(legalOpDir) or not os.path.exists(illegalOpDir):
-        os.makedirs(legalOpDir)
-        os.makedirs(illegalOpDir)
-
-    for dirname, dirnames, filenames in os.walk(ipDir):
-        for fileName in filenames:
-            user = os.path.basename(dirname)
-            user = re.findall('\d+', user)[0]
-
-            if fileName in legalSessions:
-                if not os.path.exists(legalOpDir + '\\' + user):
-                    os.makedirs(legalOpDir + '\\' + user)
-
-                csvOutFile = legalOpDir + '\\' + user + '\\' + fileName
-                countFeaturesInCsv(dirname, fileName, user, method, csvOutFile)
-            else:
-                if not os.path.exists(illegalOpDir + '\\' + user):
-                    os.makedirs(illegalOpDir + '\\' + user)
-                csvOutFile = illegalOpDir + '\\' + user + '\\' + fileName
-                countFeaturesInCsv(dirname, fileName, user, method, csvOutFile)
-    return
-
-
 ####################################################################################
 ####################################################################################
 ####################################################################################
 ####################################################################################
 
-def countFeaturesInCsv(dirname, fileName, user, method, opFile):
+def countFeaturesInCsv(dirname, fileName, user, method, opFile, legal):
     with open(opFile, "w+", newline='') as csvOutFile:
         writer = csv.writer(csvOutFile, delimiter=',')
         writer.writerow(st.csvOutHeaders)
+
+
 
         absoluteFilePath = os.path.join(dirname, fileName)
         # open csv reader and writer files
@@ -145,7 +100,7 @@ def countFeaturesInCsv(dirname, fileName, user, method, opFile):
                                                                               timeDatas, rowCntWithoutDuplicates)
 
                             # append to csv file
-                            writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt, st.mouseMove,
+                            writer.writerow([legal, method, fileName, tmpStartLine, allRows, rowCnt, st.mouseMove,
                                              distanceDetails[0], time, angleInRad, distanceDetails[1],
                                              angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2],
                                              angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5],
@@ -219,7 +174,7 @@ def countFeaturesInCsv(dirname, fileName, user, method, opFile):
                                         #     print(user, fileName, len(xCoords), len(yCoords), len(timeDatas), rowCntWithoutDuplicates, tmpStartLine, allRows)
                                         # append to csv file
                                         writer.writerow(
-                                            [user, method, fileName, tmpStartLine, allRows - 2, rowCnt - 2,
+                                            [legal, method, fileName, tmpStartLine, allRows - 2, rowCnt - 2,
                                              st.mouseMove, distanceDetails[0], time, angleInRad, distanceDetails[1],
                                              angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2],
                                              angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5],
@@ -282,7 +237,7 @@ def countFeaturesInCsv(dirname, fileName, user, method, opFile):
                                                                                                   rowCntWithoutDuplicates)
                                                 # append to csv file
                                                 writer.writerow(
-                                                    [user, method, fileName, tmpStartLine, allRows - 2, rowCnt - 2,
+                                                    [legal, method, fileName, tmpStartLine, allRows - 2, rowCnt - 2,
                                                      st.mouseMove, distanceDetails[0], time, angleInRad,
                                                      distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1],
                                                      angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4],
@@ -349,7 +304,7 @@ def countFeaturesInCsv(dirname, fileName, user, method, opFile):
                                                                                           rowCntWithoutDuplicates)
                                         # append to csv file
                                         writer.writerow(
-                                            [user, method, fileName, tmpStartLine, allRows, rowCnt, st.rightClick,
+                                            [legal, method, fileName, tmpStartLine, allRows, rowCnt, st.rightClick,
                                              distanceDetails[0], time, angleInRad, distanceDetails[1],
                                              angleVeloDetails[0], angleVeloDetails[1], angleVeloDetails[2],
                                              angleVeloDetails[3], angleVeloDetails[4], angleVeloDetails[5],
@@ -395,7 +350,7 @@ def countFeaturesInCsv(dirname, fileName, user, method, opFile):
                                             #     print(user, fileName, len(xCoords), len(yCoords), len(timeDatas), rowCntWithoutDuplicates, tmpStartLine, allRows)
 
                                             # append to csv file
-                                            writer.writerow([user, method, fileName, tmpStartLine, allRows, rowCnt,
+                                            writer.writerow([legal, method, fileName, tmpStartLine, allRows, rowCnt,
                                                              st.leftClick, distanceDetails[0], time, angleInRad,
                                                              distanceDetails[1], angleVeloDetails[0],
                                                              angleVeloDetails[1], angleVeloDetails[2],
@@ -445,7 +400,7 @@ def countFeaturesInCsv(dirname, fileName, user, method, opFile):
                                                                                                   rowCntWithoutDuplicates)
                                                 # append to csv file
                                                 writer.writerow(
-                                                    [user, method, fileName, tmpStartLine, allRows, rowCnt,
+                                                    [legal, method, fileName, tmpStartLine, allRows, rowCnt,
                                                      st.leftDrag, distanceDetails[0], time, angleInRad,
                                                      distanceDetails[1], angleVeloDetails[0], angleVeloDetails[1],
                                                      angleVeloDetails[2], angleVeloDetails[3], angleVeloDetails[4],
@@ -492,7 +447,7 @@ def countFeaturesInCsv(dirname, fileName, user, method, opFile):
                                                                                                       rowCntWithoutDuplicates)
                                                     # append to csv file
                                                     writer.writerow(
-                                                        [user, method, fileName, tmpStartLine, allRows, rowCnt,
+                                                        [legal, method, fileName, tmpStartLine, allRows, rowCnt,
                                                          st.rightDrag, distanceDetails[0], time, angleInRad,
                                                          distanceDetails[1], angleVeloDetails[0],
                                                          angleVeloDetails[1], angleVeloDetails[2],
@@ -543,11 +498,64 @@ def countFeaturesInCsv(dirname, fileName, user, method, opFile):
 ####################################################################################
 
 
+def createTestCsvEachSession():
+    ipDir = st.testDir
+    legalOpDir = st.legalOpDir
+    illegalOpDir = st.illegalOpDir
+    dataset = pd.read_csv(st.workDir + st.publicLabels)
+    fileNames = dataset.values
+
+    method = st.testMethod
+
+    legalSessions = []
+    illegalSessions = []
+
+    for i in fileNames:
+        if i[1] == 0:
+            legalSessions.append(i[0])
+        else:
+            if i[1] == 1:
+                illegalSessions.append(i[0])
+            else:
+                print(i[0], ' file legality error.')
+                continue;
+
+    if not os.path.exists(legalOpDir) or not os.path.exists(illegalOpDir):
+        os.makedirs(legalOpDir)
+        os.makedirs(illegalOpDir)
+
+    for dirname, dirnames, filenames in os.walk(ipDir):
+        for fileName in filenames:
+            user = os.path.basename(dirname)
+            user = re.findall('\d+', user)[0]
+
+            if fileName in legalSessions:
+                if not os.path.exists(legalOpDir + '\\' + user):
+                    os.makedirs(legalOpDir + '\\' + user)
+
+                csvOutFile = legalOpDir + '\\' + user + '\\' + fileName
+                countFeaturesInCsv(dirname, fileName, user, method, csvOutFile, 1)
+            else:
+                if not os.path.exists(illegalOpDir + '\\' + user):
+                    os.makedirs(illegalOpDir + '\\' + user)
+                csvOutFile = illegalOpDir + '\\' + user + '\\' + fileName
+                countFeaturesInCsv(dirname, fileName, user, method, csvOutFile, 0)
+    return
+
+# createTestCsvEachSession()
+
+
+####################################################################################
+####################################################################################
+####################################################################################
+####################################################################################
+
+
 def sortLegalAndIllegalCsv():
     ipDir = st.testDir
     legalOpDir = st.legalTestSessionCopy
     illegalOpDir = st.illegalTestSessionCopy
-    dataset = pd.read_csv(st.publicLabels)
+    dataset = pd.read_csv(st.workDir + st.publicLabels)
     fileNames = dataset.values
 
     method = st.testMethod

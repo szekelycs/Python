@@ -1,4 +1,5 @@
 from mousedynamics.utils import settings as st
+from collections import defaultdict
 import random
 import csv
 import numpy
@@ -21,6 +22,36 @@ from sklearn.metrics import recall_score
 from sklearn.ensemble import RandomForestClassifier
 import sklearn.metrics as metrics
 
+###################################################################
+###################################################################
+###################################################################
+# COLOR GENERATING UTILS
+
+def get_random_color(pastel_factor = 0.5):
+    return [(x+pastel_factor)/(1.0+pastel_factor) for x in [random.uniform(0,1.0) for i in [1,2,3]]]
+
+def color_distance(c1,c2):
+    return sum([abs(x[0]-x[1]) for x in zip(c1,c2)])
+
+def generate_new_color(existing_colors,pastel_factor = 0.5):
+    max_distance = None
+    best_color = None
+    for i in range(0,100):
+        color = get_random_color(pastel_factor = pastel_factor)
+        if not existing_colors:
+            return color
+        best_distance = min([color_distance(color,c) for c in existing_colors])
+        if not max_distance or best_distance > max_distance:
+            max_distance = best_distance
+            best_color = color
+    return best_color
+
+
+###################################################################
+###################################################################
+###################################################################
+###################################################################
+# CREATE MODELS FOR EACH USER IN FILES
 
 def trainAllUsers():
     if not os.path.exists(st.modelDir):
@@ -44,7 +75,11 @@ def trainAllUsers():
 
 # trainAllUsers()
 
-
+###################################################################
+###################################################################
+###################################################################
+###################################################################
+# UI UTILITY
 
 def testForUI(user, session, legality):
     rf = pickle.load(open(st.modelDir + user, 'rb'))
@@ -87,42 +122,75 @@ def testSessionForUser(rf, user, featureTestFile, legality):
 
     XValLength = len(X_validation)
     if(legality == 1):
-        print("LEGAL SCORES")
+        # print("LEGAL SCORES")
         p = 'legal'
         for i in range(0, XValLength):
             Y_validation.append(1)
     else:
-        print("ILLEGAL SCORES")
+        # print("ILLEGAL SCORES")
         p = 'illegal'
         for i in range(0, XValLength):
             Y_validation.append(0)
 
     # rf = RandomForestClassifier(n_estimators=NUM_TREES)
     # rf.fit(X_train, Y_train)
-    predictions = rf.predict(X_validation)
-    userAccuracy = accuracy_score(Y_validation, predictions)  # Y_predict
+    scores = rf.predict_proba(X_validation)
+    yValShape = numpy.shape(Y_validation)
 
-    print("Accuracy score")
-    print("User " + re.findall('\d+', user)[0], userAccuracy, p)
-    # print("Precision score")
-    # print(precision_score(Y_validation, predictions))
-    # print("Recall score")
-    # print(recall_score(Y_validation, predictions))
-    # print("Confusion matrix")
-    # print(confusion_matrix(Y_validation, predictions))
-    # print("Classification report")
-    # print(classification_report(Y_validation, predictions))
+    scoreArray = numpy.zeros((yValShape[0], 2))
 
-    return userAccuracy
+    for i, j, k in zip(Y_validation, scores, range(0, yValShape[0])):
+        scoreArray[k][0] = i
+        scoreArray[k][1] = j[1]
+
+    return scoreArray
+
+def plotAUC(data_no, user, color, method ):
+    labels_no = data_no['label']
+    scores_no = data_no['score']
+    auc_value_no =   metrics.roc_auc_score(numpy.array(labels_no), numpy.array(scores_no) )
+
+    fpr_no, tpr_no, thresholds_no = metrics.roc_curve(labels_no, scores_no, pos_label=1)
+    eer_no = brentq(lambda x: 1. - x - interp1d(fpr_no, tpr_no)(x), 0., 1.)
+    # print("System AUC", auc_value_no)
+    # print("System EER:",eer_no)
+    #meghatározza az eer_no értékhez tartozó küszöbértéket
+    thresh_no = interp1d(fpr_no, thresholds_no)(eer_no)
+    # print(thresh_no)
+
+
+    lw = 2
+    # plt.plot(fpr_no, tpr_no, color='black', lw=lw, label='AUC = %0.4f' % auc_value_no)
+    plt.plot(fpr_no, tpr_no, color=color, lw=lw, label='user' + user + ' = %0.4f' % auc_value_no)
+
+    plt.plot([0, 1], [0, 1], color='darkorange', lw=lw, linestyle='--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('AUC')
+    plt.legend(loc="lower right")
+
+    # return auc_value_no
+    return thresh_no
+
 # testSessionForUser(st.classificationDir + 'userClassification7.csv', st.legalOpDir + '7\\session_1244242475', 1)
 
-def loopThroughLegalIllegal(legality):
-    accuracy = []
-    if legality == 1:
-        walkDir = st.legalOpDir
-    else:
-        walkDir = st.illegalOpDir
+def loopThroughLegalIllegal():
+    predictions = defaultdict(list)
+
+    auc = []
+
+    colors = []
+    k = 0
+    for i in range(0, 10):
+        colors.append(generate_new_color(colors))
+
+
+    legality = 0
+    plt.figure()
     for dirname, dirnames, filenames in os.walk(st.classificationDir):
+
         for fileName in filenames:
             user = re.findall('\d+', fileName)[0]
             trainDataset = pd.read_csv(st.classificationDir + fileName)
@@ -135,18 +203,45 @@ def loopThroughLegalIllegal(legality):
             rf = RandomForestClassifier(n_estimators=NUM_TREES)
             rf.fit(X_train, Y_train)
 
-            for dirnameTest, dirnamesTest, filenamesTest in os.walk(walkDir):
+            for dirnameTest, dirnamesTest, filenamesTest in os.walk(st.legalOpDir):
                 for testDirName in dirnamesTest:
+                    j = 0
                     if testDirName == user:
-                        for d1, d2, testFileNamesInTmpDir in os.walk(walkDir + testDirName):
+                        for d1, d2, testFileNamesInTmpDir in os.walk(st.legalOpDir + testDirName):
                             for testFileNameInTmpDir in testFileNamesInTmpDir:
                                 # print(walkDir, testDirName, testFileNameInTmpDir)
-                                testSessionForUser(rf, user, walkDir + user + "\\" + testFileNameInTmpDir, legality)
+                                preds = testSessionForUser(rf, user, st.legalOpDir + user + "\\" + testFileNameInTmpDir, legality)
+                                predictions[user].append(numpy.mean(preds[:, 1]))
+                        labelArray = []
+
+                        for i in range(0, len(predictions[user])):
+                            labelArray.append(1)
+
+                        j = 0
+                        for d1, d2, testFileNamesInTmpDir in os.walk(st.illegalOpDir + testDirName):
+                            for testFileNameInTmpDir in testFileNamesInTmpDir:
+                                # print(walkDir, testDirName, testFileNameInTmpDir)
+                                preds = testSessionForUser(rf, user, st.illegalOpDir + user + "\\" + testFileNameInTmpDir, legality)
+                                predictions[user].append(numpy.mean(preds[:, 1]))
+                                j = j + 1
+
+                        for i in range(0, j):
+                            labelArray.append(0)
+                        df = pd.DataFrame(columns=['label', 'score'])
+
+                        df['label'] = labelArray
+                        df['score'] = predictions[user]
+
+
+                        auc.append(plotAUC(df, user, colors[k], 'test'))
+                        k = k + 1
+    print(numpy.mean(auc))
+    print(numpy.std(auc))
+    plt.show()
 
 
 
-
-# loopThroughLegalIllegal(1)
+# loopThroughLegalIllegal()
 
 ####################################################################################
 ####################################################################################
@@ -271,56 +366,6 @@ def loopThroughUsersTrainFilesOnly():
 #TRESHOLD CALCULATION
 
 
-def get_random_color(pastel_factor = 0.5):
-    return [(x+pastel_factor)/(1.0+pastel_factor) for x in [random.uniform(0,1.0) for i in [1,2,3]]]
-
-def color_distance(c1,c2):
-    return sum([abs(x[0]-x[1]) for x in zip(c1,c2)])
-
-def generate_new_color(existing_colors,pastel_factor = 0.5):
-    max_distance = None
-    best_color = None
-    for i in range(0,100):
-        color = get_random_color(pastel_factor = pastel_factor)
-        if not existing_colors:
-            return color
-        best_distance = min([color_distance(color,c) for c in existing_colors])
-        if not max_distance or best_distance > max_distance:
-            max_distance = best_distance
-            best_color = color
-    return best_color
-
-
-def plotAUC(data_no, user, color, method ):
-    labels_no = data_no['label']
-    scores_no = data_no['score']
-    auc_value_no =   metrics.roc_auc_score(numpy.array(labels_no), numpy.array(scores_no) )
-
-    fpr_no, tpr_no, thresholds_no = metrics.roc_curve(labels_no, scores_no, pos_label=1)
-    eer_no = brentq(lambda x: 1. - x - interp1d(fpr_no, tpr_no)(x), 0., 1.)
-    # print("System AUC", auc_value_no)
-    # print("System EER:",eer_no)
-    #meghatározza az eer_no értékhez tartozó küszöbértéket
-    thresh_no = interp1d(fpr_no, thresholds_no)(eer_no)
-    # print(thresh_no)
-
-
-    lw = 2
-    # plt.plot(fpr_no, tpr_no, color='black', lw=lw, label='AUC = %0.4f' % auc_value_no)
-    plt.plot(fpr_no, tpr_no, color=color, lw=lw, label='user' + user + ' ' + method + ' = %0.4f' % auc_value_no)
-
-    plt.plot([0, 1], [0, 1], color='darkorange', lw=lw, linestyle='--')
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('AUC')
-    plt.legend(loc="lower right")
-
-    # return auc_value_no
-    return thresh_no
-
-
 def tresholdUtil(featureFileName):
     dataset = pd.read_csv(st.classificationDir + featureFileName)
     NUM_TREES = 500
@@ -385,13 +430,13 @@ def testAUCutil(featureFileName, featureTestFile):
 
 
 
-
-
 def calculateThresholds():
     accuracy = []
+    trainAUCscores = []
+    testAUCscores = []
     with open(st.thresholdFile, "w+", newline='') as opCsv:
         writer = csv.writer(opCsv, delimiter=',')
-        plt.figure()
+
 
         colors = []
         k = 0
@@ -401,27 +446,31 @@ def calculateThresholds():
         # testAUCScores = []
         # trainAUCScores = []
 
-        for dirname, dirnames, filenames in os.walk(st.classificationDir):
-            for fileName in filenames:
-                user = os.path.basename(fileName)
-                user = re.findall('\d+', fileName)[0]
-                # print(user, " ", fileName)
-
-                ppscore = testAUCutil(fileName, st.classificationTestDir + st.classOutputTestFile + user + '.csv')
-
-                # print(numpy.mean(ppscore[:,1]))
-                df = pd.DataFrame(columns=['label', 'score'])
-                df['label'] = ppscore[:, 0]
-                df['score'] = ppscore[:, 1]
-
-
-                threshold = plotAUC(df, user, colors[k], 'test')
-                # testAUCScores.append(auc_test)
-                k = k + 1
-
-        plt.show()
+        # plt.figure()
+        #
+        # for dirname, dirnames, filenames in os.walk(st.classificationDir):
+        #     for fileName in filenames:
+        #         user = os.path.basename(fileName)
+        #         user = re.findall('\d+', fileName)[0]
+        #         # print(user, " ", fileName)
+        #
+        #         ppscore = testAUCutil(fileName, st.classificationTestDir + st.classOutputTestFile + user + '.csv')
+        #
+        #         # print(numpy.mean(ppscore[:,1]))
+        #         df = pd.DataFrame(columns=['label', 'score'])
+        #         df['label'] = ppscore[:, 0]
+        #         df['score'] = ppscore[:, 1]
+        #
+        #
+        #         threshold = plotAUC(df, user, colors[k], 'test')
+        #         # auc = plotAUC(df, user, colors[k], 'test')
+        #         # testAUCscores.append(auc)
+        #         k = k + 1
+        #
+        # plt.show()
         plt.figure()
-        # print("TEST MEAN = " + str(numpy.mean(testAUCScores)))
+        # print("TEST MEAN = " + str(numpy.mean(testAUCscores)))
+        # print("TEST STD = " + str(numpy.std(testAUCscores)))
 
 
         k = 0
@@ -437,16 +486,24 @@ def calculateThresholds():
                 df['score'] = ppscore[:, 1]
 
                 threshold = plotAUC(df, user, colors[k], 'train')
+                # auc = plotAUC(df, user, colors[k], 'train')
+                # trainAUCscores.append(auc)
 
                 writer.writerow([user, threshold])
 
                 # trainAUCScores.append(auc_train)
                 k = k + 1
-        # print("TRAIN MEAN = " + str(numpy.mean(trainAUCScores)))
+        # print("TRAIN MEAN = " + str(numpy.mean(trainAUCscores)))
+        # print("TRAIN AUC STDEV: ", numpy.std(trainAUCscores))
         plt.show()
-            # input("Press enter to continue...")
 
 # calculateThresholds()
+
+#########################################################################################
+#########################################################################################
+#########################################################################################
+#########################################################################################
+# creates plots with train and test auc on the same plot by user
 
 def plotAUCtestTrain():
     accuracy = []
